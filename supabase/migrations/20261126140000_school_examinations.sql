@@ -40,7 +40,7 @@ begin
  else update public.school_exams set name=trim(p_payload->>'name'),academic_year_id=v_year,term_id=v_term,exam_type=coalesce(nullif(p_payload->>'exam_type',''),'end_of_term'),start_date=v_start,end_date=v_end,status=v_status,updated_at=now() where school_id=p_school_id and id=p_exam_id and status in ('draft','open') returning id into v_id; if v_id is null then raise exception 'Exam not found or already submitted';end if;end if;
  insert into public.school_grade_bands(school_id,grade,minimum_percent,description,sort_order) values(p_school_id,'A',80,'Excellent',1),(p_school_id,'B',70,'Very good',2),(p_school_id,'C',60,'Good',3),(p_school_id,'D',50,'Satisfactory',4),(p_school_id,'E',40,'Needs improvement',5),(p_school_id,'F',0,'Below standard',6) on conflict(school_id,grade) do nothing;
  return v_id;
-end $;
+end $$;
 create or replace function public.manage_school_exam_subject(p_school_id uuid,p_exam_id uuid,p_class_id uuid,p_subject_id uuid,p_maximum_mark numeric,p_record_id uuid default null)
 returns uuid language plpgsql security definer set search_path=public,private,pg_temp as $$
 declare v_id uuid;
