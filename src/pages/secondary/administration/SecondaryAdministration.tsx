@@ -5,7 +5,8 @@ import coneduLogo from "../../../assets/conedu-logo.svg";
 import { adminGroups, allAdminModules, type AdminModule } from "./modules";
 import StudentManagement from "./StudentManagement";
 import StaffManagement from "./StaffManagement";
-import ClassesSubjects from "./ClassesSubjects";\nimport AcademicCalendar from "./AcademicCalendar";
+import ClassesSubjects from "./ClassesSubjects";
+import AcademicCalendar from "./AcademicCalendar";
 import "./administration.css";
 
 type Props = { schoolId: string; schoolName: string; role?: string };
