@@ -71,3 +71,11 @@ create policy library_loans_update on public.school_library_loans for update to 
 create or replace function public.guard_school_library_copy_status() returns trigger language plpgsql set search_path=public as $$ begin if old.status='issued' and new.status<>'issued' and exists(select 1 from public.school_library_loans l where l.copy_id=old.id and l.returned_at is null) then raise exception 'Cannot change copy status while an active loan exists'; end if; return new; end $$;
 revoke all on function public.guard_school_library_copy_status() from public,anon,authenticated;
 create trigger school_library_copy_status_guard before update of status on public.school_library_copies for each row execute function public.guard_school_library_copy_status();
+
+create index school_library_books_created_by_idx on public.school_library_books(created_by);
+create index school_library_loans_school_idx on public.school_library_loans(school_id);
+create index school_library_loans_copy_idx on public.school_library_loans(copy_id);
+create index school_library_loans_student_fk_idx on public.school_library_loans(student_id);
+create index school_library_loans_borrower_membership_idx on public.school_library_loans(borrower_membership_id);
+create index school_library_loans_issued_by_idx on public.school_library_loans(issued_by);
+create index school_library_loans_returned_by_idx on public.school_library_loans(returned_by);
