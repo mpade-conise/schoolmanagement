@@ -27,23 +27,23 @@ grant select on public.primary_student_progression_history to authenticated;
 create policy primary_progression_history_read on public.primary_student_progression_history for select to authenticated using (private.has_school_role(school_id,array['owner','proprietor','school_admin','headteacher','deputy_headteacher','registrar','academic_officer']::text[]));
 create or replace function public.progress_primary_school_students(p_school_id uuid,p_student_ids uuid[],p_target_class_id uuid,p_target_academic_year_id uuid,p_action text,p_effective_date date default current_date,p_reason text default null)
 returns integer language plpgsql security definer set search_path=public,private,pg_temp as $$
-declare v_student_id uuid; v_source record; v_count integer:=0;
+declare v_student_id uuid; v_source record; v_count integer:=0; v_target_order smallint;
 begin
  if auth.uid() is null then raise exception 'Authentication required'; end if;
  if not private.has_school_role(p_school_id,array['owner','proprietor','school_admin','headteacher','registrar']::text[]) then raise exception 'You do not have permission to progress learners in this school'; end if;
- if p_action not in ('promotion','repetition','class_transfer') then raise exception 'Invalid learner progression action'; end if;
+ if p_action is null or p_action not in ('promotion','repetition','class_transfer') then raise exception 'Invalid learner progression action'; end if;
  if coalesce(cardinality(p_student_ids),0)<1 or cardinality(p_student_ids)>500 then raise exception 'Select between 1 and 500 learners'; end if;
  if (select count(distinct x) from unnest(p_student_ids) x)<>cardinality(p_student_ids) then raise exception 'Duplicate learner IDs were supplied'; end if;
  if p_effective_date is null then raise exception 'Effective date is required'; end if;
  if length(coalesce(p_reason,''))>1000 then raise exception 'Reason must be 1000 characters or fewer'; end if;
  if not exists(select 1 from public.academic_years y where y.id=p_target_academic_year_id and y.school_id=p_school_id) then raise exception 'The selected academic year does not belong to this school'; end if;
- if not exists(select 1 from public.classes c join public.grade_levels g on g.id=c.grade_level_id where c.id=p_target_class_id and c.school_id=p_school_id and c.academic_year_id=p_target_academic_year_id and c.is_active and g.education_level='primary' and g.is_active) then raise exception 'Select an active primary class in the selected academic year'; end if;
+ select g.sort_order into v_target_order from public.classes c join public.grade_levels g on g.id=c.grade_level_id where c.id=p_target_class_id and c.school_id=p_school_id and c.academic_year_id=p_target_academic_year_id and c.is_active and g.education_level='primary' and g.is_active; if v_target_order is null then raise exception 'Select an active primary class in the selected academic year'; end if;
  for v_student_id in select unnest(p_student_ids) loop
   if not exists(select 1 from public.students s where s.id=v_student_id and s.school_id=p_school_id and s.status='active') then raise exception 'One or more selected learners are not active students in this school'; end if;
-  select e.id,e.class_id,e.academic_year_id,e.enrollment_date into v_source from public.student_enrollments e where e.school_id=p_school_id and e.student_id=v_student_id and e.status='enrolled' order by e.enrollment_date desc limit 1 for update;
+  select e.id,e.class_id,e.academic_year_id,e.enrollment_date,g.sort_order grade_order into v_source from public.student_enrollments e join public.classes c on c.id=e.class_id join public.grade_levels g on g.id=c.grade_level_id where e.school_id=p_school_id and e.student_id=v_student_id and e.status='enrolled' order by e.enrollment_date desc limit 1 for update of e;
   if v_source.id is null then raise exception 'Every selected learner must have an active class enrolment'; end if;
   if p_effective_date<v_source.enrollment_date then raise exception 'Effective date cannot be earlier than a learner''s current enrolment date'; end if;
-  if v_source.class_id=p_target_class_id and v_source.academic_year_id=p_target_academic_year_id then raise exception 'Target class is already the learner''s current class'; end if;
+  if v_source.class_id=p_target_class_id and v_source.academic_year_id=p_target_academic_year_id then raise exception 'Target class is already the learner''s current class'; end if; if p_action='promotion' and v_target_order<>v_source.grade_order+1 then raise exception 'Promotion must move the learner to the next standard'; end if; if p_action='repetition' and v_target_order<>v_source.grade_order then raise exception 'Repetition must keep the learner in the same standard'; end if; if p_action='class_transfer' and (p_target_academic_year_id<>v_source.academic_year_id or v_target_order<>v_source.grade_order) then raise exception 'Internal class transfers must stay in the same academic year and standard'; end if;
   if exists(select 1 from public.student_enrollments e where e.school_id=p_school_id and e.student_id=v_student_id and e.academic_year_id=p_target_academic_year_id and e.status='enrolled') then raise exception 'A selected learner is already enrolled in the target academic year'; end if;
   update public.student_enrollments set status='completed',exit_date=p_effective_date where id=v_source.id;
   insert into public.student_enrollments(school_id,student_id,class_id,academic_year_id,enrollment_date,status) values(p_school_id,v_student_id,p_target_class_id,p_target_academic_year_id,p_effective_date,'enrolled');
