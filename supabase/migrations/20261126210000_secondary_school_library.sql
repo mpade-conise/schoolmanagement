@@ -79,3 +79,9 @@ create index school_library_loans_student_fk_idx on public.school_library_loans(
 create index school_library_loans_borrower_membership_idx on public.school_library_loans(borrower_membership_id);
 create index school_library_loans_issued_by_idx on public.school_library_loans(issued_by);
 create index school_library_loans_returned_by_idx on public.school_library_loans(returned_by);
+
+revoke update on public.school_library_loans from authenticated;
+grant update(returned_at,returned_by) on public.school_library_loans to authenticated;
+create or replace function public.guard_school_library_loan_return() returns trigger language plpgsql set search_path=public as $$ begin if old.returned_at is not null and new.returned_at is distinct from old.returned_at then raise exception 'A completed library loan cannot be reopened or changed'; end if; if old.returned_by is not null and new.returned_by is distinct from old.returned_by then raise exception 'The return record is immutable'; end if; if old.returned_at is null and new.returned_at is not null and new.returned_by is null then raise exception 'A return must be recorded by an authorised staff member'; end if; return new; end $$;
+revoke all on function public.guard_school_library_loan_return() from public,anon,authenticated;
+create trigger school_library_loan_return_guard before update of returned_at,returned_by on public.school_library_loans for each row execute function public.guard_school_library_loan_return();
