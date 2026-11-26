@@ -33,13 +33,13 @@ function App(){
   if(loading)return <main className="portal-page"><p>Checking your school access…</p></main>;
   if(!membership)return <main className="portal-page"><h1>School access required</h1><p>Your account has no active school membership. A school administrator must invite you and assign your role.</p><button onClick={()=>supabase?.auth.signOut()}>Sign out</button></main>;
   if(school?.school_type!==portalType)return <main className="portal-page"><h1>School type mismatch</h1><p>This account is assigned to a {school?.school_type||"different"} school. You cannot open the {portalType} portal.</p><a href="/">Return to your school dashboard</a></main>;
-  const isAdmin=["school_admin","headteacher"].includes(portalRole||"");
+  const isAdmin=["school_admin","headteacher","academic_officer"].includes(portalRole||"");
   const isTeacher=["teacher","class_teacher","academic_officer","deputy_headteacher"].includes(portalRole||"");
   const isFamily=["parent","student"].includes(portalRole||"");
   if(portalPath===`/${portalType}`)return portalType==="primary"?<PrimaryPage/>:<SecondaryPage/>;
   const isAdminPath=portalPath.endsWith("/administration"),isTeacherPath=portalPath.endsWith("/teacher"),isFamilyPath=portalPath.endsWith("/parents-students");
   if((isAdminPath&&!isAdmin)||(isTeacherPath&&!isTeacher)||(isFamilyPath&&!isFamily))return <main className="portal-page"><h1>Access restricted</h1><p>Your assigned role does not have access to this portal.</p><a href={`/${portalType}`}>Return to portals</a></main>;
-  if(portalPath===`/${portalType}/administration`)return portalType==="primary"?<PrimaryAdministration schoolId={membership.school_id} schoolName={school?.name||"School"}/>:<SecondaryAdministration schoolId={membership.school_id} schoolName={school?.name||"School"}/>;
+  if(portalPath===`/${portalType}/administration`)return portalType==="primary"?<PrimaryAdministration schoolId={membership.school_id} schoolName={school?.name||"School"}/>:<SecondaryAdministration schoolId={membership.school_id} schoolName={school?.name||"School"} role={portalRole||""}/>;
   if(portalPath===`/${portalType}/teacher`)return portalType==="primary"?<PrimaryTeacher/>:<SecondaryTeacher/>;
   if(portalPath===`/${portalType}/parents-students`)return portalType==="primary"?<PrimaryParentsStudents/>:<SecondaryParentsStudents/>;
   return <main className="portal-page"><h1>Page not found</h1><a href={`/${portalType}`}>Return to portals</a></main>;
