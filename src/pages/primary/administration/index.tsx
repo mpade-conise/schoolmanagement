@@ -1,2 +1,2 @@
-import AdminPortal from "../../../components/AdminPortal";
-export default function PrimaryAdministration({schoolId,schoolName}:{schoolId:string;schoolName:string}){return <AdminPortal schoolId={schoolId} schoolName={schoolName} schoolType="primary" back="/primary"/>}
+import PrimaryAdministrationWorkspace from "./PrimaryAdministration";
+export default function PrimaryAdministration({schoolId,schoolName,role="school_admin"}:{schoolId:string;schoolName:string;role?:string}){return <PrimaryAdministrationWorkspace schoolId={schoolId} schoolName={schoolName} role={role}/>}
