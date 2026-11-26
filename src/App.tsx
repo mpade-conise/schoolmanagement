@@ -33,7 +33,7 @@ function App(){
   if(loading)return <main className="portal-page"><p>Checking your school access…</p></main>;
   if(!membership)return <main className="portal-page"><h1>School access required</h1><p>Your account has no active school membership. A school administrator must invite you and assign your role.</p><button onClick={()=>supabase?.auth.signOut()}>Sign out</button></main>;
   if(school?.school_type!==portalType)return <main className="portal-page"><h1>School type mismatch</h1><p>This account is assigned to a {school?.school_type||"different"} school. You cannot open the {portalType} portal.</p><a href="/">Return to your school dashboard</a></main>;
-  const isAdmin=portalRole==="school_admin"||portalRole==="headteacher";
+  const isAdmin=portalRole==="school_admin";
   const isTeacher=["teacher","class_teacher","academic_officer","deputy_headteacher"].includes(portalRole||"");
   const isFamily=["parent","student"].includes(portalRole||"");
   if(portalPath===`/${portalType}`)return portalType==="primary"?<PrimaryPage/>:<SecondaryPage/>;
