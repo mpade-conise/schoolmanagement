@@ -14,6 +14,12 @@ create table if not exists public.primary_student_progression_history (
 );
 create index if not exists primary_progression_school_student_idx on public.primary_student_progression_history(school_id,student_id,effective_date desc);
 create index if not exists primary_progression_school_date_idx on public.primary_student_progression_history(school_id,effective_date desc);
+create index if not exists primary_progression_student_fk_idx on public.primary_student_progression_history(student_id);
+create index if not exists primary_progression_from_class_fk_idx on public.primary_student_progression_history(from_class_id);
+create index if not exists primary_progression_from_year_fk_idx on public.primary_student_progression_history(from_academic_year_id);
+create index if not exists primary_progression_to_class_fk_idx on public.primary_student_progression_history(to_class_id);
+create index if not exists primary_progression_to_year_fk_idx on public.primary_student_progression_history(to_academic_year_id);
+create index if not exists primary_progression_recorded_by_fk_idx on public.primary_student_progression_history(recorded_by);
 alter table public.primary_student_progression_history enable row level security;
 alter table public.primary_student_progression_history force row level security;
 revoke all on public.primary_student_progression_history from public,anon,authenticated;
