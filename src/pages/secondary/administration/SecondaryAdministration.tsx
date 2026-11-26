@@ -84,7 +84,7 @@ export default function SecondaryAdministration({ schoolId, schoolName, role = "
 
 function ModuleCard({ module, onOpen }: { module: AdminModule; onOpen: () => void }) {
  const Icon = module.icon;
- return <button className="sec-admin-module-card" onClick={onOpen}><span className="sec-admin-module-icon"><Icon size={19}/></span><strong>{module.title}</strong><p>{module.description}</p><span className="sec-admin-module-footer"><span>Feature catalogue</span><ArrowUpRight size={15}/></span></button>;
+ return <button className="sec-admin-module-card" onClick={onOpen}><span className="sec-admin-module-icon"><Icon size={19}/></span><strong>{module.title}</strong><p>{module.description}</p><span className="sec-admin-module-footer"><span>{module.status === "active" ? "Operational module" : "Feature catalogue"}</span><ArrowUpRight size={15}/></span></button>;
 }
 function ModulePage({ module, onBack }: { module: AdminModule; onBack: () => void }) {
  const Icon = module.icon;
