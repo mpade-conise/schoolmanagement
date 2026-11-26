@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Activity, ArrowUpRight, Bell, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, Command, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, X } from "lucide-react";
+import { Activity, ArrowUpRight, Bell, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, X } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
 import coneduLogo from "../../../assets/conedu-logo.svg";
 import { adminGroups, allAdminModules, type AdminModule } from "./modules";
@@ -48,7 +48,7 @@ export default function SecondaryAdministration({ schoolId, schoolName }: Props)
    <div className="sec-school-chip"><div className="sec-school-mark">{schoolName.slice(0,1).toUpperCase() || "S"}</div><div><strong>{schoolName}</strong><span>School administration</span></div><ChevronDown size={15}/></div>
    <div className="sec-admin-nav">
     <button className={active === "overview" ? "sec-nav-item active" : "sec-nav-item"} onClick={() => openModule("overview")}><LayoutDashboard size={17}/><span>Overview</span></button>
-    {filteredGroups.map(group => <section className="sec-nav-group" key={group.title}><p>{group.title}</p>{group.items.map(item => <button key={item.id} className={active === item.id ? "sec-nav-item active" : "sec-nav-item"} onClick={() => openModule(item.id)}><item.icon size={17}/><span>{item.title}</span></button>)}</section>)}
+    {filteredGroups.map(group => <section className="sec-nav-group" key={group.title}><p>{group.title}</p>{group.items.map(item => { const Icon = item.icon; return <button key={item.id} className={active === item.id ? "sec-nav-item active" : "sec-nav-item"} onClick={() => openModule(item.id)}><Icon size={17}/><span>{item.title}</span></button>; })}</section>)}
    </div>
    <div className="sec-admin-sidebar-bottom"><div className="sec-admin-help"><CircleHelp size={17}/><strong>Administration guide</strong><span>School management workspace</span></div><button className="sec-admin-signout" onClick={() => supabase?.auth.signOut()}><LogOut size={16}/> Sign out</button></div>
   </aside>
