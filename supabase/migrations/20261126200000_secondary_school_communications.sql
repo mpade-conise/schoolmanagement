@@ -19,6 +19,8 @@ create table public.school_announcements (
 );
 create index school_announcements_school_status_date on public.school_announcements(school_id,status,publish_at desc);
 create index school_announcements_class on public.school_announcements(class_id) where class_id is not null;
+create index school_announcements_created_by_idx on public.school_announcements(created_by);
+create index school_announcements_published_by_idx on public.school_announcements(published_by);
 alter table public.school_announcements enable row level security;
 alter table public.school_announcements force row level security;
 revoke all on public.school_announcements from public,anon;
@@ -41,6 +43,9 @@ alter table public.school_announcement_audit enable row level security;
 alter table public.school_announcement_audit force row level security;
 revoke all on public.school_announcement_audit from public,anon;
 grant select on public.school_announcement_audit to authenticated;
+create index school_announcement_audit_school_idx on public.school_announcement_audit(school_id,changed_at desc);
+create index school_announcement_audit_actor_idx on public.school_announcement_audit(actor_membership_id);
+create index school_announcement_audit_announcement_idx on public.school_announcement_audit(announcement_id);
 create policy school_announcement_audit_read on public.school_announcement_audit for select to authenticated using(exists(select 1 from public.school_memberships m where m.school_id=school_announcement_audit.school_id and m.user_id=(select auth.uid()) and m.is_active and m.role in ('owner','school_admin','headteacher')));
 create or replace function public.log_school_announcement_change() returns trigger language plpgsql security definer set search_path=public as $$
 declare actor_id uuid; action_name text; school_value uuid; announcement_value uuid; title_value text; status_value text;
