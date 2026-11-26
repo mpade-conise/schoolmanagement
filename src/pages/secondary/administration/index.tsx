@@ -1,2 +1,2 @@
-import AdminPortal from "../../../components/AdminPortal";
-export default function SecondaryAdministration({schoolId,schoolName}:{schoolId:string;schoolName:string}){return <AdminPortal schoolId={schoolId} schoolName={schoolName} schoolType="secondary" back="/secondary"/>}
+import SecondaryAdministration from "./SecondaryAdministration";
+export default SecondaryAdministration;
