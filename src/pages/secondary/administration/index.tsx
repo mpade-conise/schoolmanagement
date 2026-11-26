@@ -1,1 +1,2 @@
-export default function SecondaryAdministration(){return <main className="portal-page"><a href="/secondary">← Secondary portals</a><h1>Secondary administration portal</h1><p>The designated school administrator controls staff invitations, role assignments, school settings and access approvals.</p><section><strong>Portal foundation</strong><p>Feature implementation starts after access control and school membership are confirmed. No sample records are shown.</p></section></main>
+import AdminPortal from "../../../components/AdminPortal";
+export default function SecondaryAdministration({schoolId,schoolName}:{schoolId:string;schoolName:string}){return <AdminPortal schoolId={schoolId} schoolName={schoolName} schoolType="secondary" back="/secondary"/>}
