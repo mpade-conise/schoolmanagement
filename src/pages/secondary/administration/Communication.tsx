@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useState} from "react";
-import {Archive,CalendarClock,Download,Edit3,FileText,Megaphone,Plus,RefreshCw,Send,Trash2,X} from "lucide-react";
+import {Archive,CalendarClock,Download,Edit3,Megaphone,Plus,RefreshCw,Send,Trash2,X} from "lucide-react";
 import {supabase} from "../../../lib/supabase";
 type Row={id:string;title:string;body:string;priority:"normal"|"important"|"urgent";audience_type:"school"|"roles"|"class";audience_roles:string[];class_id:string|null;status:"draft"|"published"|"archived";publish_at:string;attachment_path:string|null;created_by:string;created_at:string;classes?:{name:string}|null};
 type ClassRow={id:string;name:string};
