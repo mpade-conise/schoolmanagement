@@ -47,7 +47,7 @@ begin
 end $$;
 revoke all on function public.sync_school_library_copy_status() from public,anon,authenticated;
 create trigger school_library_copy_loan_status after insert or update of returned_at or delete on public.school_library_loans for each row execute function public.sync_school_library_copy_status();
-create or replace function public.touch_school_library_book() returns trigger language plpgsql as $$ begin new.updated_at=now();return new;end $$;
+create or replace function public.touch_school_library_book() returns trigger language plpgsql set search_path=public as $ begin new.updated_at=now();return new;end $$;
 revoke all on function public.touch_school_library_book() from public,anon,authenticated;
 create trigger school_library_book_updated_at before update on public.school_library_books for each row execute function public.touch_school_library_book();
 
