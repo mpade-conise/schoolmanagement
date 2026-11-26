@@ -38,8 +38,9 @@ begin
  if not exists(select 1 from public.terms t where t.id=v_term and t.school_id=p_school_id and t.academic_year_id=v_year and v_start>=t.start_date and v_end<=t.end_date) then raise exception 'Exam dates and term must belong to the selected academic year';end if;
  if p_exam_id is null then insert into public.school_exams(school_id,academic_year_id,term_id,name,exam_type,start_date,end_date,status,created_by) values(p_school_id,v_year,v_term,trim(p_payload->>'name'),coalesce(nullif(p_payload->>'exam_type',''),'end_of_term'),v_start,v_end,v_status,auth.uid()) returning id into v_id;
  else update public.school_exams set name=trim(p_payload->>'name'),academic_year_id=v_year,term_id=v_term,exam_type=coalesce(nullif(p_payload->>'exam_type',''),'end_of_term'),start_date=v_start,end_date=v_end,status=v_status,updated_at=now() where school_id=p_school_id and id=p_exam_id and status in ('draft','open') returning id into v_id; if v_id is null then raise exception 'Exam not found or already submitted';end if;end if;
+ insert into public.school_grade_bands(school_id,grade,minimum_percent,description,sort_order) values(p_school_id,'A',80,'Excellent',1),(p_school_id,'B',70,'Very good',2),(p_school_id,'C',60,'Good',3),(p_school_id,'D',50,'Satisfactory',4),(p_school_id,'E',40,'Needs improvement',5),(p_school_id,'F',0,'Below standard',6) on conflict(school_id,grade) do nothing;
  return v_id;
-end $$;
+end $;
 create or replace function public.manage_school_exam_subject(p_school_id uuid,p_exam_id uuid,p_class_id uuid,p_subject_id uuid,p_maximum_mark numeric,p_record_id uuid default null)
 returns uuid language plpgsql security definer set search_path=public,private,pg_temp as $$
 declare v_id uuid;
@@ -82,7 +83,11 @@ returns void language plpgsql security definer set search_path=public,private,pg
 begin
  if auth.uid() is null then raise exception 'Authentication required';end if;
  if not private.has_school_role(p_school_id,array['owner','school_admin','headteacher']::text[]) then raise exception 'Only school leadership can review results';end if;
- if p_action='submit' then update public.school_exams set status='submitted',updated_at=now() where id=p_exam_id and school_id=p_school_id and status in ('draft','open');
+ if p_action='submit' then
+  if not exists(select 1 from public.school_exam_subjects es where es.school_id=p_school_id and es.exam_id=p_exam_id) then raise exception 'Add at least one class subject before submitting';end if;
+  if exists(select 1 from public.school_exam_subjects es join public.school_exams e on e.id=es.exam_id and e.school_id=es.school_id where es.school_id=p_school_id and es.exam_id=p_exam_id and (select count(*) from public.school_exam_marks m where m.school_id=p_school_id and m.exam_subject_id=es.id)<>(select count(*) from public.student_enrollments en join public.students st on st.id=en.student_id and st.school_id=en.school_id where en.school_id=p_school_id and en.class_id=es.class_id and en.academic_year_id=e.academic_year_id and en.status='enrolled' and st.status='active')) then raise exception 'Every exam subject must have a mark for every active enrolled student';end if;
+  update public.school_exam_subjects set status='submitted' where school_id=p_school_id and exam_id=p_exam_id and status='open';
+  update public.school_exams set status='submitted',updated_at=now() where id=p_exam_id and school_id=p_school_id and status in ('draft','open');
  elsif p_action='approve' then update public.school_exams set status='approved',approved_by=auth.uid(),approved_at=now(),updated_at=now() where id=p_exam_id and school_id=p_school_id and status='submitted';
  elsif p_action='publish' then update public.school_exams set status='published',updated_at=now() where id=p_exam_id and school_id=p_school_id and status='approved';
  else raise exception 'Invalid review action';end if;
