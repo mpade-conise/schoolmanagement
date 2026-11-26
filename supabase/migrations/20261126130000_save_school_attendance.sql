@@ -4,7 +4,7 @@ language plpgsql
 security definer
 set search_path=public,private,pg_temp
 as $$
-declare v_session uuid; v_year uuid; v_term_start date; v_term_end date; v_uid uuid; v_membership uuid; v_can_manage boolean; v_enrolled_count integer; v_record_count integer;
+declare v_session uuid; v_year uuid; v_term_start date; v_term_end date; v_uid uuid; v_membership uuid; v_can_manage boolean; v_enrolled_count integer; v_record_count integer; v_input_count integer;
 begin
  v_uid:=auth.uid();
  if v_uid is null then raise exception 'Authentication required'; end if;
@@ -24,8 +24,9 @@ begin
  if exists(select 1 from jsonb_array_elements(p_records) r where coalesce(r->>'status','') not in ('present','absent','late','excused')) then raise exception 'Invalid attendance status'; end if;
  if exists(select 1 from jsonb_array_elements(p_records) r where not exists(select 1 from public.student_enrollments e join public.students s on s.school_id=e.school_id and s.id=e.student_id where e.school_id=p_school_id and e.student_id=(r->>'student_id')::uuid and e.class_id=p_class_id and e.academic_year_id=v_year and e.status='enrolled' and s.status='active')) then raise exception 'Attendance includes a student not actively enrolled in this class'; end if;
  select count(*) into v_enrolled_count from public.student_enrollments e join public.students s on s.school_id=e.school_id and s.id=e.student_id where e.school_id=p_school_id and e.class_id=p_class_id and e.academic_year_id=v_year and e.status='enrolled' and s.status='active';
+ select count(*) into v_input_count from jsonb_array_elements(p_records);
  select count(distinct (r->>'student_id')::uuid) into v_record_count from jsonb_array_elements(p_records) r;
- if v_record_count<>v_enrolled_count then raise exception 'Attendance must include every active enrolled student exactly once'; end if;
+ if v_input_count<>v_record_count or v_record_count<>v_enrolled_count then raise exception 'Attendance must include every active enrolled student exactly once'; end if;
  insert into public.attendance_sessions(school_id,class_id,term_id,attendance_date,taken_by_membership_id,status,submitted_at)
  values(p_school_id,p_class_id,p_term_id,p_attendance_date,v_membership,case when p_submit then 'submitted' else 'open' end,case when p_submit then now() else null end)
  on conflict(class_id,attendance_date) do update set term_id=excluded.term_id,taken_by_membership_id=excluded.taken_by_membership_id,status=excluded.status,submitted_at=excluded.submitted_at
