@@ -29,5 +29,5 @@ Deno.serve(async(req)=>{
  if(inviteError||!invited.user)return reply(400,{error:inviteError?.message||"Invitation could not be sent"});
  const {error:insertError}=await admin.from("school_memberships").insert({school_id:schoolId,user_id:invited.user.id,role,is_active:true});
  if(insertError){await admin.auth.admin.deleteUser(invited.user.id);return reply(400,{error:"Invitation could not be assigned to this school and role"});}
- return reply(200,{success:true,message:"Invitation sent. The account will receive only the role assigned by this school.",school:school.name,role});
+ return reply(200,{success:true,user_id:invited.user.id,message:"Invitation sent. The account will receive only the role assigned by this school.",school:school.name,role});
 });
