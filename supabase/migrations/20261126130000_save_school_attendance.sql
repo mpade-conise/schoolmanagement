@@ -1,8 +1,8 @@
 create or replace function public.save_school_attendance(p_school_id uuid,p_class_id uuid,p_term_id uuid,p_attendance_date date,p_records jsonb,p_submit boolean default false)
 returns uuid
 language plpgsql
-security invoker
-set search_path=public,private
+security definer
+set search_path=public,private,pg_temp
 as $$
 declare v_session uuid; v_year uuid; v_term_start date; v_term_end date; v_uid uuid; v_membership uuid; v_can_manage boolean; v_enrolled_count integer; v_record_count integer;
 begin
@@ -16,7 +16,7 @@ begin
  if not found then raise exception 'Select a term belonging to the class academic year'; end if;
  if p_attendance_date<v_term_start or p_attendance_date>v_term_end then raise exception 'Attendance date must fall within the selected term'; end if;
  select sm.id into v_membership from public.school_memberships sm where sm.school_id=p_school_id and sm.user_id=v_uid and sm.is_active limit 1;
- v_can_manage:=private.has_school_role(p_school_id,array['owner','school_admin','headteacher','deputy_headteacher','academic_officer']::text[]);
+ v_can_manage:=private.has_school_role(p_school_id,array['owner','school_admin','headteacher']::text[]);
  if not v_can_manage and not exists(select 1 from public.classes c where c.id=p_class_id and c.school_id=p_school_id and c.class_teacher_membership_id=v_membership)
  and not exists(select 1 from public.class_subjects cs where cs.school_id=p_school_id and cs.class_id=p_class_id and cs.teacher_membership_id=v_membership) then
   raise exception 'You are not assigned to this class';
