@@ -27,7 +27,7 @@ begin
   select start_date,end_date into v_start,v_end from public.academic_years where id=v_year and school_id=p_school_id;
   if not found then raise exception 'Select an academic year belonging to this school'; end if;
   if (p_payload->>'start_date')::date < v_start or (p_payload->>'end_date')::date > v_end then raise exception 'Term dates must be within the selected academic year'; end if;
-  if v_current then update public.academic_years set is_current=true where id=v_year and school_id=p_school_id; update public.academic_years set is_current=false where school_id=p_school_id and id<>v_year; update public.terms set is_current=false where school_id=p_school_id and id is distinct from p_record_id; end if;
+  if v_current then update public.academic_years set is_current=false where school_id=p_school_id and id<>v_year; update public.academic_years set is_current=true where id=v_year and school_id=p_school_id; update public.terms set is_current=false where school_id=p_school_id and id is distinct from p_record_id; end if;
   if p_record_id is null then insert into public.terms(school_id,academic_year_id,name,term_number,start_date,end_date,is_current) values(p_school_id,v_year,trim(p_payload->>'name'),(p_payload->>'term_number')::smallint,(p_payload->>'start_date')::date,(p_payload->>'end_date')::date,v_current) returning id into v_id;
   else update public.terms set academic_year_id=v_year,name=trim(p_payload->>'name'),term_number=(p_payload->>'term_number')::smallint,start_date=(p_payload->>'start_date')::date,end_date=(p_payload->>'end_date')::date,is_current=v_current where school_id=p_school_id and id=p_record_id returning id into v_id; end if;
   if v_id is null then raise exception 'Term not found in this school'; end if;
