@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertCircle, Bell, BookOpen, CalendarDays, CheckCircle2, Clock3, CreditCard, Download, GraduationCap, RefreshCw, ShieldCheck, UserRound } from "lucide-react";
+import { AlertCircle, Bell, BookOpen, CalendarDays, Clock3, CreditCard, Download, RefreshCw, ShieldCheck } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
 import "./parents-students.css";
 
