@@ -25,5 +25,5 @@ export const roleModules: Record<SchoolRole, readonly SchoolModule[]> = {
   student: ["dashboard","classes","attendance","examinations","timetable","communications"],
   proprietor: ["dashboard","reports","fees"]
 };
-export const roleOptions = (schoolType: SchoolType) => Object.entries(roleLabels).filter(([role]) => role !== "proprietor" || schoolType !== "primary" && schoolType !== "secondary").map(([value,label]) => ({ value: value as SchoolRole, label }));
+export const roleOptions = (_schoolType: SchoolType) => Object.entries(roleLabels).map(([value,label]) => ({ value: value as SchoolRole, label }));
 export const canAccessModule = (role: SchoolRole, module: SchoolModule) => roleModules[role].includes(module);
