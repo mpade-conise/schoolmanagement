@@ -25,3 +25,38 @@ begin
 end $function$;
 revoke all on function public.manage_primary_school_structure(uuid,text,jsonb,uuid) from public,anon;
 grant execute on function public.manage_primary_school_structure(uuid,text,jsonb,uuid) to authenticated;
+
+create or replace function public.enforce_primary_academic_structure()
+returns trigger language plpgsql security definer set search_path=public,private,pg_temp as $function$
+declare v_school_type text; v_level text; v_enrolled integer;
+begin
+ select school_type into v_school_type from public.schools where id=new.school_id;
+ if tg_table_name='grade_levels' then
+  if new.education_level='primary' and new.sort_order not between 1 and 8 then raise exception 'Primary standards must be numbered from 1 to 8'; end if;
+  if v_school_type='primary' and new.education_level<>'primary' then raise exception 'This school can only configure primary standards'; end if;
+  if v_school_type='secondary' and new.education_level<>'secondary' then raise exception 'This school can only configure secondary forms'; end if;
+ elsif tg_table_name='classes' then
+  select education_level into v_level from public.grade_levels where id=new.grade_level_id and school_id=new.school_id;
+  if v_school_type='primary' and v_level<>'primary' then raise exception 'Primary classes must belong to a primary standard'; end if;
+  if v_school_type='secondary' and v_level<>'secondary' then raise exception 'Secondary classes must belong to a secondary form'; end if;
+  if new.capacity is not null then select count(*) into v_enrolled from public.student_enrollments where school_id=new.school_id and class_id=new.id and status='enrolled'; if v_enrolled>new.capacity then raise exception 'Class capacity cannot be lower than the current enrolment (%)',v_enrolled; end if; end if;
+ elsif tg_table_name='subjects' then
+  if v_school_type='primary' and new.education_level not in ('primary','both') then raise exception 'This school can only configure primary learning areas'; end if;
+  if v_school_type='secondary' and new.education_level not in ('secondary','both') then raise exception 'This school can only configure secondary subjects'; end if;
+ elsif tg_table_name='class_subjects' then
+  select g.education_level into v_level from public.classes c join public.grade_levels g on g.id=c.grade_level_id where c.id=new.class_id and c.school_id=new.school_id;
+  if v_level='primary' and not exists(select 1 from public.subjects where id=new.subject_id and school_id=new.school_id and education_level in ('primary','both')) then raise exception 'Primary classes can only be assigned primary learning areas'; end if;
+  if v_level='secondary' and not exists(select 1 from public.subjects where id=new.subject_id and school_id=new.school_id and education_level in ('secondary','both')) then raise exception 'Secondary classes can only be assigned secondary subjects'; end if;
+ end if;
+ return new;
+end $function$;
+revoke all on function public.enforce_primary_academic_structure() from public,anon,authenticated;
+drop trigger if exists enforce_primary_grade_level on public.grade_levels;
+create trigger enforce_primary_grade_level before insert or update of school_id,education_level,sort_order on public.grade_levels for each row execute function public.enforce_primary_academic_structure();
+drop trigger if exists enforce_primary_class on public.classes;
+create trigger enforce_primary_class before insert or update of school_id,grade_level_id,capacity on public.classes for each row execute function public.enforce_primary_academic_structure();
+drop trigger if exists enforce_primary_subject on public.subjects;
+create trigger enforce_primary_subject before insert or update of school_id,education_level on public.subjects for each row execute function public.enforce_primary_academic_structure();
+drop trigger if exists enforce_primary_class_subject on public.class_subjects;
+create trigger enforce_primary_class_subject before insert or update of school_id,class_id,subject_id on public.class_subjects for each row execute function public.enforce_primary_academic_structure();
+create unique index if not exists grade_levels_primary_standard_order_uidx on public.grade_levels(school_id,sort_order) where education_level='primary';
