@@ -3,20 +3,22 @@ import { Activity, ArrowUpRight, Bell, ChevronDown, ChevronLeft, ChevronRight, C
 import { supabase } from "../../../lib/supabase";
 import coneduLogo from "../../../assets/conedu-logo.svg";
 import { adminGroups, allAdminModules, type AdminModule } from "./modules";
+import StudentManagement from "./StudentManagement";
 import "./administration.css";
 
-type Props = { schoolId: string; schoolName: string };
+type Props = { schoolId: string; schoolName: string; role?: string };
 type Counts = { students: number; staff: number; classes: number; attendance: number };
 const emptyCounts: Counts = { students: 0, staff: 0, classes: 0, attendance: 0 };
 
-export default function SecondaryAdministration({ schoolId, schoolName }: Props) {
+export default function SecondaryAdministration({ schoolId, schoolName, role = "school_admin" }: Props) {
  const [active, setActive] = useState("overview");
  const [mobileOpen, setMobileOpen] = useState(false);
  const [query, setQuery] = useState("");
  const [counts, setCounts] = useState<Counts>(emptyCounts);
  const [loading, setLoading] = useState(true);
  const [error, setError] = useState("");
- const filteredGroups = useMemo(() => adminGroups.map(group => ({ ...group, items: group.items.filter(item => (item.title + " " + item.description + " " + item.features.join(" ")).toLowerCase().includes(query.toLowerCase())) })).filter(group => group.items.length), [query]);
+ const roleModules = role === "academic_officer" ? new Set(["students","classes","attendance","exams","timetable","reports"]) : null;
+ const filteredGroups = useMemo(() => adminGroups.map(group => ({ ...group, items: group.items.filter(item => (!roleModules || roleModules.has(item.id)) && (item.title + " " + item.description + " " + item.features.join(" ")).toLowerCase().includes(query.toLowerCase())) })).filter(group => group.items.length), [query, role]);
  const selected = allAdminModules.find(module => module.id === active);
  useEffect(() => {
   let alive = true;
@@ -56,7 +58,7 @@ export default function SecondaryAdministration({ schoolId, schoolName }: Props)
   <main className="sec-admin-main">
    <header className="sec-admin-topbar"><button className="sec-icon-btn sec-mobile-open" onClick={() => setMobileOpen(true)} aria-label="Open sidebar"><Menu size={19}/></button><div className="sec-admin-breadcrumb"><span>Secondary school</span><ChevronRight size={14}/><strong>{selected?.title || "Administration overview"}</strong></div><div className="sec-admin-top-actions"><div className="sec-admin-search"><Search size={16}/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search administration modules" aria-label="Search administration modules"/></div><button className="sec-icon-btn" aria-label="Notifications" disabled title="Notifications will be connected in the communications module"><Bell size={18}/></button><span className="sec-admin-role"><ShieldCheck size={15}/> Administrator</span></div></header>
    <div className="sec-admin-content">
-    {active === "overview" ? <><div className="sec-admin-welcome"><div><div className="sec-admin-eyebrow"><span/> SCHOOL ADMINISTRATION</div><h1>Administration overview</h1><p>Manage school operations, academic activities, people and resources from one workspace.</p></div><div className="sec-admin-date"><Activity size={15}/>{dateLabel}</div></div>
+    {active === "students" ? <StudentManagement schoolId={schoolId} onBack={() => openModule("overview")} /> : active === "overview" ? <><div className="sec-admin-welcome"><div><div className="sec-admin-eyebrow"><span/> SCHOOL ADMINISTRATION</div><h1>Administration overview</h1><p>Manage school operations, academic activities, people and resources from one workspace.</p></div><div className="sec-admin-date"><Activity size={15}/>{dateLabel}</div></div>
      {error && <div className="sec-admin-error" role="alert"><strong>Live data unavailable</strong><span>{error}. Dashboard values are not replaced with sample data.</span></div>}
      <div className="sec-admin-stats">{statCards.map(card => <button className="sec-admin-stat" key={card.id} onClick={() => openModule(card.id)}><span>{card.label}</span><strong>{loading ? "—" : card.value.toLocaleString()}</strong><small>{card.note}</small><ArrowUpRight size={16}/></button>)}</div>
      <section className="sec-admin-section-head"><div><h2>Administration modules</h2><p>Open a module to review its functions and implementation status.</p></div><span>{allAdminModules.length} modules</span></section>
