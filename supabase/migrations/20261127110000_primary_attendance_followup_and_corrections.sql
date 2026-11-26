@@ -64,3 +64,21 @@ revoke all on function public.review_primary_attendance_correction(uuid,uuid,tex
 grant execute on function public.manage_primary_attendance_followup(uuid,uuid,text,text,text,uuid) to authenticated;
 grant execute on function public.request_primary_attendance_correction(uuid,uuid,text,text,text) to authenticated;
 grant execute on function public.review_primary_attendance_correction(uuid,uuid,text,text) to authenticated;
+create index if not exists primary_attendance_followups_assigned_to_idx on public.primary_attendance_followups(assigned_to);
+create index if not exists primary_attendance_followups_recorded_by_idx on public.primary_attendance_followups(recorded_by);
+create index if not exists primary_attendance_followups_updated_by_idx on public.primary_attendance_followups(updated_by);
+create index if not exists primary_attendance_corrections_requested_by_idx on public.primary_attendance_correction_requests(requested_by);
+create index if not exists primary_attendance_corrections_reviewed_by_idx on public.primary_attendance_correction_requests(reviewed_by);
+create or replace function public.manage_primary_attendance_followup(p_school_id uuid,p_record_id uuid,p_reason text,p_status text,p_notes text default null,p_assigned_to uuid default null)
+returns uuid language plpgsql security definer set search_path=public,private,pg_temp as $$
+declare v_id uuid;
+begin
+ if auth.uid() is null or not private.has_school_role(p_school_id,array['owner','proprietor','school_admin','headteacher','deputy_headteacher','academic_officer']::text[]) then raise exception 'You do not have permission to manage attendance follow-up'; end if;
+ if coalesce(length(trim(p_reason)),0)<2 or length(p_reason)>1000 then raise exception 'Provide an absence reason'; end if;
+ if p_status not in ('pending','contacted','resolved','unreachable') then raise exception 'Invalid follow-up status'; end if;
+ if not exists(select 1 from public.attendance_records ar join public.attendance_sessions s on s.id=ar.session_id and s.school_id=ar.school_id where ar.id=p_record_id and ar.school_id=p_school_id and ar.status in ('absent','late')) then raise exception 'Attendance record not found or is not absent/late'; end if;
+ if p_assigned_to is not null and not exists(select 1 from public.school_memberships m where m.id=p_assigned_to and m.school_id=p_school_id and m.is_active and m.role in ('owner','proprietor','school_admin','headteacher','deputy_headteacher','academic_officer','teacher','class_teacher')) then raise exception 'Select an active school staff member'; end if;
+ insert into public.primary_attendance_followups(school_id,attendance_record_id,absence_reason,follow_up_status,follow_up_notes,assigned_to,recorded_by,updated_by) values(p_school_id,p_record_id,trim(p_reason),p_status,nullif(trim(p_notes),''),p_assigned_to,auth.uid(),auth.uid())
+ on conflict(attendance_record_id) do update set absence_reason=excluded.absence_reason,follow_up_status=excluded.follow_up_status,guardian_contacted_at=case when excluded.follow_up_status='contacted' then coalesce(primary_attendance_followups.guardian_contacted_at,now()) else primary_attendance_followups.guardian_contacted_at end,follow_up_notes=excluded.follow_up_notes,assigned_to=excluded.assigned_to,updated_by=auth.uid(),updated_at=now() returning id into v_id;
+ return v_id;
+end $$;
