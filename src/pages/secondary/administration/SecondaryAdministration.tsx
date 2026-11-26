@@ -29,7 +29,7 @@ export default function SecondaryAdministration({ schoolId, schoolName, role = "
  const [counts, setCounts] = useState<Counts>(emptyCounts);
  const [loading, setLoading] = useState(true);
  const [error, setError] = useState("");
- const roleModules = role === "academic_officer" ? new Set(["students","classes","academic-calendar","attendance","exams","timetable","reports","discipline"]) : role === "bursar" ? new Set(["fees","reports"]) : null;
+ const roleModules = role === "academic_officer" ? new Set(["students","classes","academic-calendar","attendance","exams","timetable","reports","discipline","communications"]) : role === "bursar" ? new Set(["fees","reports"]) : null;
  const filteredGroups = useMemo(() => adminGroups.map(group => ({ ...group, items: group.items.filter(item => (!roleModules || roleModules.has(item.id)) && (item.id !== "accounts" || ["owner","school_admin","headteacher"].includes(role)) && (item.title + " " + item.description + " " + item.features.join(" ")).toLowerCase().includes(query.toLowerCase())) })).filter(group => group.items.length), [query, role]);
  const selected = allAdminModules.find(module => module.id === active);
  useEffect(() => {
