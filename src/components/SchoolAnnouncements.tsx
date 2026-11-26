@@ -1,6 +1,7 @@
 import {useEffect,useState} from "react";
 import {Bell,Download,AlertTriangle,CalendarClock} from "lucide-react";
 import {supabase} from "../lib/supabase";
+import "./announcements.css";
 type Announcement={id:string;title:string;body:string;priority:string;audience_type:string;publish_at:string;attachment_path:string|null;created_at:string;classes?:{name:string}|null};
 export default function SchoolAnnouncements({schoolId}:{schoolId:string}){
  const [items,setItems]=useState<Announcement[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState("");
