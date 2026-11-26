@@ -39,7 +39,7 @@ function App(){
   if(portalPath===`/${portalType}`)return portalType==="primary"?<PrimaryPage/>:<SecondaryPage/>;
   const isAdminPath=portalPath.endsWith("/administration"),isTeacherPath=portalPath.endsWith("/teacher"),isFamilyPath=portalPath.endsWith("/parents-students");
   if((isAdminPath&&!isAdmin)||(isTeacherPath&&!isTeacher)||(isFamilyPath&&!isFamily))return <main className="portal-page"><h1>Access restricted</h1><p>Your assigned role does not have access to this portal.</p><a href={`/${portalType}`}>Return to portals</a></main>;
-  if(portalPath===`/${portalType}/administration`)return portalType==="primary"?<PrimaryAdministration/>:<SecondaryAdministration/>;
+  if(portalPath===`/${portalType}/administration`)return portalType==="primary"?<PrimaryAdministration schoolId={membership.school_id} schoolName={school?.name||"School"}/>:<SecondaryAdministration schoolId={membership.school_id} schoolName={school?.name||"School"}/>;
   if(portalPath===`/${portalType}/teacher`)return portalType==="primary"?<PrimaryTeacher/>:<SecondaryTeacher/>;
   if(portalPath===`/${portalType}/parents-students`)return portalType==="primary"?<PrimaryParentsStudents/>:<SecondaryParentsStudents/>;
   return <main className="portal-page"><h1>Page not found</h1><a href={`/${portalType}`}>Return to portals</a></main>;
