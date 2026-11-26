@@ -7,3 +7,5 @@
 .sec-staff .sec-students-table{min-width:850px}.sec-staff-wide{grid-column:1/-1}.sec-staff-active{grid-column:1/-1}.sec-staff .sec-students-table td>small{display:block;font-size:9px;color:#9aa4b5;margin-top:4px}@media(max-width:650px){.sec-staff-wide,.sec-staff-active{grid-column:auto}}
 
 .sec-academic-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 15px}.sec-academic-tabs button{display:flex;align-items:center;gap:8px;border:1px solid #e9edf5;background:#fff;border-radius:8px;padding:9px 12px;color:#78849b;font-size:10px;cursor:pointer}.sec-academic-tabs button.active{border-color:#cfd5ff;background:#eef1ff;color:#5368e8;font-weight:700}.sec-academic-tabs button span{border-radius:5px;background:#f2f4f8;padding:3px 5px;font-size:9px}.sec-academic-tabs button.active span{background:#fff}.sec-academic-wide{grid-column:1/-1}@media(max-width:650px){.sec-academic-tabs button{flex:1;justify-content:center;padding:8px 6px}.sec-academic-wide{grid-column:auto}}
+
+.sec-academic-actions{display:flex;gap:8px;flex-wrap:wrap}.sec-student-secondary{background:#fff;color:#5368e8}.sec-student-secondary:hover{background:#f3f5ff}
