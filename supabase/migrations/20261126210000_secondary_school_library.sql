@@ -30,7 +30,8 @@ alter table public.school_library_books enable row level security; alter table p
 alter table public.school_library_copies enable row level security; alter table public.school_library_copies force row level security;
 alter table public.school_library_loans enable row level security; alter table public.school_library_loans force row level security;
 revoke all on public.school_library_books,public.school_library_copies,public.school_library_loans from public,anon;
-grant select,insert,update,delete on public.school_library_books,public.school_library_copies,public.school_library_loans to authenticated;
+grant select,insert,update,delete on public.school_library_books,public.school_library_copies to authenticated;
+grant select,insert,update on public.school_library_loans to authenticated;
 create schema if not exists private; revoke all on schema private from public,anon; grant usage on schema private to authenticated;
 create or replace function private.can_manage_school_library(p_school_id uuid) returns boolean language sql stable security definer set search_path=public as $$
  select exists(select 1 from public.school_memberships m where m.school_id=p_school_id and m.user_id=(select auth.uid()) and m.is_active and m.role in ('owner','school_admin','headteacher','deputy_headteacher','academic_officer'))
@@ -62,3 +63,11 @@ create policy library_books_read on public.school_library_books for select to au
 create policy library_books_insert on public.school_library_books for insert to authenticated with check(private.can_manage_school_library(school_id) and exists(select 1 from public.school_memberships m where m.id=created_by and m.school_id=school_library_books.school_id and m.user_id=(select auth.uid()) and m.is_active));
 create policy library_books_update on public.school_library_books for update to authenticated using(private.can_manage_school_library(school_id)) with check(private.can_manage_school_library(school_id) and exists(select 1 from public.school_memberships m where m.id=created_by and m.school_id=school_library_books.school_id));
 create policy library_books_delete on public.school_library_books for delete to authenticated using(private.can_manage_school_library(school_id));
+
+revoke delete on public.school_library_loans from authenticated;
+drop policy if exists library_loans_delete on public.school_library_loans;
+drop policy library_loans_update on public.school_library_loans;
+create policy library_loans_update on public.school_library_loans for update to authenticated using(private.can_manage_school_library(school_id)) with check(private.can_manage_school_library(school_id) and exists(select 1 from public.school_library_copies c where c.id=copy_id and c.school_id=school_library_loans.school_id) and exists(select 1 from public.school_memberships m where m.id=issued_by and m.school_id=school_library_loans.school_id) and (returned_by is null or exists(select 1 from public.school_memberships m where m.id=returned_by and m.school_id=school_library_loans.school_id and m.user_id=(select auth.uid()) and m.is_active)) and (student_id is null or exists(select 1 from public.students s where s.id=student_id and s.school_id=school_library_loans.school_id)) and (borrower_membership_id is null or exists(select 1 from public.school_memberships m where m.id=borrower_membership_id and m.school_id=school_library_loans.school_id)));
+create or replace function public.guard_school_library_copy_status() returns trigger language plpgsql set search_path=public as $$ begin if old.status='issued' and new.status<>'issued' and exists(select 1 from public.school_library_loans l where l.copy_id=old.id and l.returned_at is null) then raise exception 'Cannot change copy status while an active loan exists'; end if; return new; end $$;
+revoke all on function public.guard_school_library_copy_status() from public,anon,authenticated;
+create trigger school_library_copy_status_guard before update of status on public.school_library_copies for each row execute function public.guard_school_library_copy_status();
