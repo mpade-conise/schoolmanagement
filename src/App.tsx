@@ -36,7 +36,7 @@ function App(){
   const isAdmin=["proprietor","school_admin","headteacher","deputy_headteacher","academic_officer","bursar"].includes(portalRole||"");
   const isTeacher=["teacher","class_teacher","academic_officer","deputy_headteacher"].includes(portalRole||"");
   const isFamily=["parent","student"].includes(portalRole||"");
-  if(portalPath===`/${portalType}`)return portalType==="primary"?<PrimaryPage/>:<SecondaryPage/>;
+  if(portalPath===`/${portalType}`)return portalType==="primary"?<PrimaryPage role={portalRole||""}/>:<SecondaryPage role={portalRole||""}/>;
   const isAdminPath=portalPath.endsWith("/administration"),isTeacherPath=portalPath.endsWith("/teacher"),isFamilyPath=portalPath.endsWith("/parents-students");
   if((isAdminPath&&!isAdmin)||(isTeacherPath&&!isTeacher)||(isFamilyPath&&!isFamily))return <main className="portal-page"><h1>Access restricted</h1><p>Your assigned role does not have access to this portal.</p><a href={`/${portalType}`}>Return to portals</a></main>;
   if(portalPath===`/${portalType}/administration`)return portalType==="primary"?<PrimaryAdministration schoolId={membership.school_id} schoolName={school?.name||"School"}/>:<SecondaryAdministration schoolId={membership.school_id} schoolName={school?.name||"School"} role={portalRole||""}/>;
