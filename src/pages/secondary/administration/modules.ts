@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Activity, BookOpen, CalendarDays, ClipboardCheck, CreditCard, FileBarChart, GraduationCap, Library, Megaphone, Package, Settings, ShieldCheck, Stethoscope, Users, Wallet, Warehouse } from "lucide-react";
+import { BookOpen, CalendarDays, ClipboardCheck, FileBarChart, GraduationCap, Library, Megaphone, Package, Settings, ShieldCheck, Stethoscope, Users, Wallet, Warehouse } from "lucide-react";
 
 export type AdminModule = { id: string; title: string; description: string; icon: LucideIcon; features: string[]; status?: "planned" | "active" };
 export type AdminGroup = { title: string; items: AdminModule[] };
