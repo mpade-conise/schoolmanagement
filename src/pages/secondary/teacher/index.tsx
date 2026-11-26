@@ -4,7 +4,8 @@ import {supabase} from "../../../lib/supabase";
 import "./teacher.css";
 import TeacherAttendance from "./TeacherAttendance";
 import TeacherPlanning from "./TeacherPlanning";
-import TeacherMarking from "./TeacherMarking";\nimport TeacherExams from "./TeacherExams";
+import TeacherMarking from "./TeacherMarking";
+import TeacherExams from "./TeacherExams";
 type Props={schoolId:string;schoolName:string;role:string};type ClassRow={id:string;name:string;academic_year_id:string;class_teacher_membership_id:string|null;academic_years?:{name:string}|null};type Subject={id:string;name:string;code:string|null};type Assignment={class_id:string;subject_id:string;teacher_membership_id:string|null};type Lesson={id:string;class_id:string;subject_id:string;weekday:number;start_time:string;end_time:string;room:string|null};
 const days=["Monday","Tuesday","Wednesday","Thursday","Friday"],tm=(v:string)=>v.slice(0,5);
 export default function SecondaryTeacher({schoolId,schoolName,role}:Props){
