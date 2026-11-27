@@ -1,4 +1,4 @@
-export type SchoolType = "primary" | "secondary";
+export type SchoolType = "secondary";
 export type SchoolRole = "school_admin" | "headteacher" | "deputy_headteacher" | "bursar" | "teacher" | "class_teacher" | "academic_officer" | "parent" | "student" | "proprietor";
 export type SchoolModule = "dashboard" | "students" | "staff" | "classes" | "attendance" | "fees" | "reports" | "settings" | "examinations" | "timetable" | "communications";
 export const roleLabels: Record<SchoolRole, string> = {
@@ -25,5 +25,5 @@ export const roleModules: Record<SchoolRole, readonly SchoolModule[]> = {
   student: ["dashboard","classes","attendance","examinations","timetable","communications"],
   proprietor: ["dashboard","reports","fees"]
 };
-export const roleOptions = (_schoolType: SchoolType) => Object.entries(roleLabels).map(([value,label]) => ({ value: value as SchoolRole, label }));
+export const roleOptions = () => Object.entries(roleLabels).map(([value,label]) => ({ value: value as SchoolRole, label }));
 export const canAccessModule = (role: SchoolRole, module: SchoolModule) => roleModules[role].includes(module);
