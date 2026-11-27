@@ -1,0 +1,1 @@
+alter table public.student_profile_details add column if not exists student_phone text;
