@@ -1,0 +1,1 @@
+create index if not exists school_events_created_by_idx on public.school_events(created_by); create index if not exists school_staff_attendance_recorded_by_idx on public.school_staff_attendance(recorded_by);
