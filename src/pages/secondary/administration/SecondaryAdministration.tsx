@@ -54,10 +54,6 @@ export default function SecondaryAdministration({ schoolId, schoolName, role = "
  </div>;
 }
 
-function ModuleCard({ module, onOpen }: { module: AdminModule; onOpen: () => void }) {
- const Icon = module.icon;
- return <button className="sec-admin-module-card" onClick={onOpen}><span className="sec-admin-module-icon"><Icon size={19}/></span><strong>{module.title}</strong><p>{module.description}</p><span className="sec-admin-module-footer"><span>{module.status === "active" ? "Operational module" : "Feature catalogue"}</span><ArrowUpRight size={15}/></span></button>;
-}
 function ModulePage({ module, onBack }: { module: AdminModule; onBack: () => void }) {
  const Icon = module.icon;
  return <section className="sec-admin-module-page"><button className="sec-admin-back" onClick={onBack}><ChevronLeft size={16}/> Administration overview</button><div className="sec-admin-module-title"><span className="sec-admin-module-icon"><Icon size={22}/></span><div><div className="sec-admin-eyebrow"><span/> ADMINISTRATION MODULE</div><h1>{module.title}</h1><p>{module.description}</p></div></div><div className="sec-admin-status"><span className="sec-admin-status-dot"/> Feature scope defined <span>·</span> Database workflows will be connected in implementation stages</div><h2>Included features</h2><div className="sec-admin-feature-grid">{module.features.map((feature, index) => <div className="sec-admin-feature" key={feature}><span>{String(index + 1).padStart(2, "0")}</span><p>{feature}</p></div>)}</div><div className="sec-admin-implementation"><strong>Implementation status</strong><p>This page defines the administration features. Data entry, editing, approvals and reports will be enabled when this module's database tables, validation and role-specific RLS policies are implemented. No sample records are shown.</p></div></section>;
