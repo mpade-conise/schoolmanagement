@@ -1,2 +1,0 @@
-import PrimaryAdministrationWorkspace from "./PrimaryAdministration";
-export default function PrimaryAdministration({schoolId,schoolName,role="school_admin"}:{schoolId:string;schoolName:string;role?:string}){return <PrimaryAdministrationWorkspace schoolId={schoolId} schoolName={schoolName} role={role}/>}
