@@ -45,7 +45,7 @@ export default function AdministrationDashboard({schoolId,role,onOpen}:Props){
   const results=await Promise.all(requests);const pick=(i:number)=>results[i].error?[]:(results[i].data||[]) as Row[];
   const critical=[0,1,2,3,4,5,7,8].map(i=>results[i].error).filter(Boolean);
   if(critical.length){setError(critical[0].message);setLoading(false);return}
-  const students=pick(0),enrollments=pick(1),classes=pick(2),staff=pick(3),members=pick(4),todaySessions=pick(5),exams=pick(6),accounts=pick(7),payments=pick(8),announcements=pick(9),accessAudit=pick(10),examApprovals=pick(11),caseApprovals=pick(12),teacherAttendance=pick(13),trendSessions=pick(14),examSubjects=pick(15),marks=pick(16),publishedExams=pick(17),announcementAudit=pick(18),leaveApprovals=pick(19);
+  const students=pick(0),enrollments=pick(1),classes=pick(2),staff=pick(3),members=pick(4),todaySessions=pick(5),exams=pick(6),accounts=pick(7),payments=pick(8),announcements=pick(9),accessAudit=pick(10),examApprovals=pick(11),caseApprovals=pick(12),teacherAttendance=pick(13),trendSessions=pick(14),examSubjects=pick(15),marks=pick(16),publishedExams=pick(17),announcementAudit=pick(18),leaveApprovals=pick(19),events=pick(20);
   const sessionIds=todaySessions.map(x=>x.id);let todayRecords:Row[]=[];
   if(sessionIds.length){const r=await supabase.from("attendance_records").select("session_id,student_id,status").eq("school_id",schoolId).in("session_id",sessionIds);if(!r.error)todayRecords=(r.data||[]) as Row[]}
   let trendRecords:Row[]=[];if(trendSessions.length){const r=await supabase.from("attendance_records").select("session_id,status").eq("school_id",schoolId).in("session_id",trendSessions.map(x=>x.id));if(!r.error)trendRecords=(r.data||[]) as Row[]}
