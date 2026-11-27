@@ -1,5 +1,5 @@
 import type {LucideIcon} from "lucide-react";
-import {Activity,BookOpen,CalendarDays,ClipboardCheck,FileBarChart,GraduationCap,Library,Megaphone,Package,Settings,ShieldCheck,Stethoscope,Users,Wallet} from "lucide-react";
+import {BookOpen,CalendarDays,ClipboardCheck,FileBarChart,GraduationCap,Library,Megaphone,Package,Settings,ShieldCheck,Stethoscope,Users,Wallet} from "lucide-react";
 export type PrimaryModule={id:string;title:string;description:string;icon:LucideIcon;features:string[];status?:"active"|"planned"};
 export type PrimaryGroup={title:string;items:PrimaryModule[]};
 export const primaryGroups:PrimaryGroup[]=[
