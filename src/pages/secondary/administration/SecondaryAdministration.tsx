@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowUpRight, Bell, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, X } from "lucide-react";
+import { Bell, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, X } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
 import coneduLogo from "../../../assets/conedu-logo.svg";
 import { adminGroups, allAdminModules, type AdminModule } from "./modules";
