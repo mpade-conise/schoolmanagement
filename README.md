@@ -1,15 +1,19 @@
 # School Management System
 
-A secure, multi-school management platform designed for primary and secondary schools in Malawi, with an architecture intended to support schools in other markets.
+A secure, multi-school management platform designed specifically for secondary schools in Malawi.
 
 ## Product direction
 
 This is a multi-tenant SaaS product: each school has its own isolated records, settings, staff, learners, academic calendar and reports. A school must never access another school's data.
 
-### Planned modules
+### Product scope
+
+ConEdu currently supports secondary schools only. Primary-school pages and workflows have been removed to keep the product focused and easier to use.
+
+## Planned modules
 
 - School setup, onboarding and staff access
-- Academic years, terms, standards/forms, classes and subjects
+- Academic years, terms, forms, classes and subjects
 - Learner admissions, enrollment and guardian contacts
 - Staff directory and teaching assignments
 - Daily attendance and attendance summaries
