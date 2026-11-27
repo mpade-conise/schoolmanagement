@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useMemo,useState} from "react";
+import {useCallback,useEffect,useState} from "react";
 import {Activity,ArrowUpRight,CalendarDays,CheckCircle2,Clock,Coins,GraduationCap,RefreshCw,Users,Wallet,ClipboardCheck,Bell,UserCheck} from "lucide-react";
 import {supabase} from "../../../lib/supabase";
 import "./dashboard.css";
@@ -11,7 +11,7 @@ const displayDate=(v:string)=>v?new Intl.DateTimeFormat("en-MW",{timeZone:"Afric
 const fullName=(s:Row)=>[s.first_name,s.middle_name,s.last_name].filter(Boolean).join(" ")||"Student";
 function BarChart({title,caption,items,format=(v:number)=>v.toLocaleString()}: {title:string;caption?:string;items:{label:string;value:number}[];format?:(v:number)=>string}){
  const max=Math.max(1,...items.map(x=>x.value));
- return <section className="adm-dash-panel"><header><div><h3>{title}</h3>{caption&&<p>{caption}</p>}</div></header>{items.length?<div className="adm-dash-bars">{items.map((x,i)=><div className="adm-dash-bar-row" key={x.label}><span title={x.label}>{x.label}</span><div className="adm-dash-bar-track"><i style={{width:`${Math.max(x.value?3:0,x.value/max*100)}%`}}/></div><strong>{format(x.value)}</strong></div>)}</div>:<div className="adm-dash-empty">Not enough recorded data yet.</div>}</section>;
+ return <section className="adm-dash-panel"><header><div><h3>{title}</h3>{caption&&<p>{caption}</p>}</div></header>{items.length?<div className="adm-dash-bars">{items.map(x=><div className="adm-dash-bar-row" key={x.label}><span title={x.label}>{x.label}</span><div className="adm-dash-bar-track"><i style={{width:`${Math.max(x.value?3:0,x.value/max*100)}%`}}/></div><strong>{format(x.value)}</strong></div>)}</div>:<div className="adm-dash-empty">Not enough recorded data yet.</div>}</section>;
 }
 function Ring({value,label}: {value:number;label:string}){return <div className="adm-dash-ring" style={{background:`conic-gradient(#5b70e8 ${Math.max(0,Math.min(100,value))}%,#e9edf5 0)`}}><div><strong>{Math.round(value)}%</strong><span>{label}</span></div></div>}
 export default function AdministrationDashboard({schoolId,role,onOpen}:Props){
@@ -43,7 +43,7 @@ export default function AdministrationDashboard({schoolId,role,onOpen}:Props){
   ];
   const results=await Promise.all(requests);const pick=(i:number)=>results[i].error?[]:(results[i].data||[]) as Row[];
   const critical=[0,1,2,3,4,5,7,8].map(i=>results[i].error).filter(Boolean);
-  if(critical.length){setError(critical[0].message);setLoading(false);return}
+  if(critical.length){setError(critical[0]?.message||"A required dashboard query failed");setLoading(false);return}
   const students=pick(0),enrollments=pick(1),classes=pick(2),staff=pick(3),members=pick(4),todaySessions=pick(5),exams=pick(6),accounts=pick(7),payments=pick(8),announcements=pick(9),accessAudit=pick(10),examApprovals=pick(11),caseApprovals=pick(12),teacherAttendance=pick(13),trendSessions=pick(14),examSubjects=pick(15),marks=pick(16),publishedExams=pick(17),announcementAudit=pick(18),events=pick(19);
   const sessionIds=todaySessions.map(x=>x.id);let todayRecords:Row[]=[];
   if(sessionIds.length){const r=await supabase.from("attendance_records").select("session_id,student_id,status").eq("school_id",schoolId).in("session_id",sessionIds);if(!r.error)todayRecords=(r.data||[]) as Row[]}
