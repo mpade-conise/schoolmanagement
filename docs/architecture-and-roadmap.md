@@ -4,7 +4,7 @@
 
 1. **Multi-school SaaS from day one.** Every school owns its data through a tenant boundary; school-specific settings and academic records are not shared.
 2. **Least privilege.** Access is controlled by active membership and school role. RLS remains enabled for exposed tables.
-3. **Malawi-first, configurable.** Defaults use Malawi, Africa/Blantyre and MWK, while schools can configure timezone, currency and academic calendar.
+3. **Secondary-school focused, Malawi-first, configurable.** Defaults use Malawi, Africa/Blantyre and MWK, while schools can configure timezone, currency and academic calendar.
 4. **Operationally reliable.** Preserve historical academic records; prefer status changes and archive workflows over deleting important records.
 5. **Sellable and maintainable.** Consistent navigation, responsive layouts, validation, clear empty states, auditability, backup/recovery and documented deployment.
 6. **Incremental delivery.** Build and verify one working module at a time without disrupting completed modules.
