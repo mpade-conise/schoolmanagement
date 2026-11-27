@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useMemo,useState} from "react";
-import {AlertCircle,BookOpen,CalendarDays,Clock3,Download,ExternalLink,GraduationCap,RefreshCw,ShieldCheck,Bell,ClipboardList} from "lucide-react";
+import {AlertCircle,BookOpen,CalendarDays,Clock3,Download,ExternalLink,RefreshCw,ShieldCheck,Bell,ClipboardList} from "lucide-react";
 import {supabase} from "../../../lib/supabase";
 import "./parents-students.css";
 type Student={id:string;admission_number:string;first_name:string;middle_name:string|null;last_name:string;photo_url:string|null;status:string;class_name:string|null};
