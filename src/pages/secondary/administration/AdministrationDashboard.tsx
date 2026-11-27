@@ -42,8 +42,9 @@ export default function AdministrationDashboard({schoolId,role,onOpen}:Props){
    supabase.from("school_events").select("id,title,event_type,start_at,end_at,location,audience,status").eq("school_id",schoolId).eq("status","scheduled").gte("start_at",new Date().toISOString()).order("start_at",{ascending:true}).limit(6)
   ];
   const results=await Promise.all(requests);const pick=(i:number)=>results[i].error?[]:(results[i].data||[]) as Row[];
-  const critical=[0,1,2,3,4,5,7,8].map(i=>results[i].error).filter(Boolean);
+  const critical=[0,1,2,5,7,8].map(i=>results[i].error).filter(Boolean);
   if(critical.length){setError(critical[0]?.message||"A required dashboard query failed");setLoading(false);return}
+  if(results.some(result=>result.error))setError("Some dashboard panels are unavailable because of school permissions or incomplete setup.");
   const students=pick(0),enrollments=pick(1),classes=pick(2),staff=pick(3),members=pick(4),todaySessions=pick(5),exams=pick(6),accounts=pick(7),payments=pick(8),announcements=pick(9),accessAudit=pick(10),examApprovals=pick(11),caseApprovals=pick(12),teacherAttendance=pick(13),trendSessions=pick(14),examSubjects=pick(15),marks=pick(16),publishedExams=pick(17),announcementAudit=pick(18),events=pick(19);
   const sessionIds=todaySessions.map(x=>x.id);let todayRecords:Row[]=[];
   if(sessionIds.length){const r=await supabase.from("attendance_records").select("session_id,student_id,status").eq("school_id",schoolId).in("session_id",sessionIds);if(!r.error)todayRecords=(r.data||[]) as Row[]}
