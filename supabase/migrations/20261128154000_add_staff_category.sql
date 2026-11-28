@@ -1,0 +1,1 @@
+alter table public.secondary_staff_details add column if not exists staff_category text not null default 'teaching' check(staff_category in('teaching','non_teaching'));
