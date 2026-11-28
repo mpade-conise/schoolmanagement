@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useState,type FormEvent} from "react";
-import {ArrowLeft,Check,Plus,RefreshCw,Wallet} from "lucide-react";
+import {ArrowLeft,Check,RefreshCw,Wallet} from "lucide-react";
 import {supabase} from "../../../lib/supabase";
 
 type Year={id:string;name:string};
