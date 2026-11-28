@@ -6,7 +6,7 @@ import StaffAssignmentsLeave from "./StaffAssignmentsLeave";
 import StaffPerformanceDiscipline from "./StaffPerformanceDiscipline";
 import StaffPayroll from "./StaffPayroll";
 
-type Staff={id:string;staff_number:string;name:string;employment_title:string|null};
+type Staff={id:string;membership_id:string;staff_number:string;name:string;employment_title:string|null};
 type Qualification={id:string;qualification_title:string;institution:string|null;qualification_level:string;award_date:string|null;verification_status:string};
 type Detail={staff_category:string;department:string;subject_specialisations:string;emergency_contact_name:string;emergency_contact_relationship:string;emergency_contact_phone:string;address:string;national_id:string};
 const empty:Detail={staff_category:"teaching",department:"",subject_specialisations:"",emergency_contact_name:"",emergency_contact_relationship:"",emergency_contact_phone:"",address:"",national_id:""};
