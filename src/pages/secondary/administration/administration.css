@@ -155,3 +155,22 @@
 .sec-student-edit:hover{border-color:#2f704b;color:#2f704b}
 .sec-academic-tabs button.active,.sec-calendar-tabs button.active,.sec-academic-workspace-tabs button.active{background:#2f704b;border-color:#2f704b;color:#fff}
 .sec-inventory-form-grid input:focus,.sec-inventory-form-grid select:focus,.sec-inventory-form-grid textarea:focus{outline-color:#2f704b}
+
+
+/* Green sidebar matching the deployment status indicator */
+.sec-admin-sidebar{background:#2f704b;border-right-color:#285f40;color:#fff}
+.sec-admin-brand strong{color:#fff}
+.sec-admin-brand span{color:#d4e7d9}
+.sec-school-chip{background:#285f40;border-color:#4b8764;color:#fff}
+.sec-school-chip strong{color:#fff}
+.sec-school-chip span,.sec-school-chip>svg{color:#d4e7d9}
+.sec-school-mark{background:#e6f0e8;color:#2f704b}
+.sec-nav-group>p{color:#c4ddca}
+.sec-nav-item{color:#e0eee3}
+.sec-nav-item:hover{background:#3c8058;color:#fff}
+.sec-nav-item.active{background:#e6f0e8;color:#2f704b}
+.sec-admin-sidebar-bottom{border-top-color:#4b8764}
+.sec-admin-help,.sec-admin-signout{color:#d4e7d9}
+.sec-admin-help strong{color:#fff}
+.sec-admin-help span{color:#c4ddca}
+.sec-admin-signout:hover{background:#fff1f1;color:#c74d59}
