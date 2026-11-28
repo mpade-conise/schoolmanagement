@@ -14,7 +14,7 @@ create index secondary_staff_history_idx on public.secondary_staff_employment_hi
 create index secondary_staff_responsibilities_idx on public.secondary_staff_responsibilities(school_id,staff_profile_id,is_active);
 create index secondary_staff_leave_idx on public.secondary_staff_leave_requests(school_id,status,start_date);
 create index secondary_staff_reviews_idx on public.secondary_staff_reviews(school_id,staff_profile_id,review_date desc);
-create index secondary_staff_discipline_idx on public.secondary_staff_discipline_records(school_id,staff_profile_id,incident_date desc);
+create index secondary_staff_discipline_idx on public.secondary_staff_disciplinary_records(school_id,staff_profile_id,incident_date desc);
 create index secondary_staff_payroll_idx on public.secondary_staff_payroll(school_id,pay_period);
 do $$ declare t text; begin foreach t in array array['secondary_staff_details','secondary_staff_qualifications','secondary_staff_documents','secondary_staff_employment_history','secondary_staff_responsibilities','secondary_staff_leave_requests','secondary_staff_reviews','secondary_staff_disciplinary_records','secondary_staff_module_settings','secondary_staff_payroll'] loop
 execute format('alter table public.%I enable row level security',t); execute format('alter table public.%I force row level security',t); execute format('grant select,insert,update,delete on public.%I to authenticated',t);
