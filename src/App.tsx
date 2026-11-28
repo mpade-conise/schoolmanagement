@@ -29,6 +29,7 @@ function App(){
  if(portalPath.startsWith("/primary"))return <Navigate to="/secondary" replace/>;
  const administrator=["proprietor","school_admin","headteacher","deputy_headteacher","academic_officer","bursar"].includes(role||"");
  if(administrator&&portalPath==="/")return <Navigate to="/secondary/administration" replace/>;
+ if(["teacher","class_teacher"].includes(role||"")&&portalPath==="/")return <Navigate to="/secondary/teacher" replace/>;
  if(portalType){
   if(loading)return <main className="portal-page"><p>Checking your school access…</p></main>;
   if(!membership)return <main className="portal-page"><h1>School access required</h1><p>Your account has no active school membership. A school administrator must invite you and assign your role.</p><button onClick={()=>supabase?.auth.signOut()}>Sign out</button></main>;
