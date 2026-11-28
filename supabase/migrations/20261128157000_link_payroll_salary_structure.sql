@@ -1,0 +1,1 @@
+alter table public.secondary_staff_payroll add column if not exists salary_structure_id uuid references public.secondary_staff_salary_structures(id) on delete set null;
