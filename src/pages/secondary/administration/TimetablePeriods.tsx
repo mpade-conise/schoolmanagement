@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useState,type FormEvent} from "react";
-import {AlertCircle,Check,Clock,Plus,RefreshCw,Send,Trash2} from "lucide-react";
+import {AlertCircle,Check,Clock,RefreshCw,Send,Trash2} from "lucide-react";
 import {supabase} from "../../../lib/supabase";
 type Period={id:string;period_number:number;name:string;start_time:string;end_time:string;period_type:"lesson"|"break";is_double_allowed:boolean};
 type Publication={version:number;is_published:boolean;published_at:string};
