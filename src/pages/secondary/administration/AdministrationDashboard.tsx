@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useState} from "react";
-import {Activity,ArrowUpRight,CalendarDays,CheckCircle2,Clock,Coins,GraduationCap,RefreshCw,Users,Wallet,ClipboardCheck,Bell,UserCheck} from "lucide-react";
+import {ArrowUpRight,CalendarDays,CheckCircle2,Clock,Coins,GraduationCap,RefreshCw,Users,Wallet,ClipboardCheck,Bell,UserCheck} from "lucide-react";
 import {supabase} from "../../../lib/supabase";
 import "./dashboard.css";
 
