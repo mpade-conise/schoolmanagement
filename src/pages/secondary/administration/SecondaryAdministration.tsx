@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Bell, GraduationCap, ChevronDown, ChevronLeft, ChevronRight, CircleHelp, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, X } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
 import coneduLogo from "../../../assets/conedu-logo.svg";
-import { adminGroups, allAdminModules, type AdminModule } from "./modules";
+import { allAdminModules, type AdminModule } from "./modules";
 import StudentManagement from "./StudentManagement";
 import StaffManagement from "./StaffManagement";
 import AcademicStructureWorkspace from "./AcademicStructureWorkspace";
@@ -31,7 +31,8 @@ export default function SecondaryAdministration({ schoolId, schoolName, role = "
  const [mobileOpen, setMobileOpen] = useState(false);
  const [query, setQuery] = useState("");
  const roleModules = role === "academic_officer" ? new Set(["students","classes","academic-calendar","attendance","exams","timetable","reports","discipline","communications","library","events"]) : role === "bursar" ? new Set(["fees","reports"]) : null;
- const filteredGroups = useMemo(() => adminGroups.map(group => ({ ...group, items: group.items.filter(item => (!roleModules || roleModules.has(item.id)) && (item.id !== "students" && item.id !== "accounts" || ["owner","school_admin","headteacher"].includes(role)) && (item.title + " " + item.description + " " + item.features.join(" ")).toLowerCase().includes(query.toLowerCase())) })).filter(group => group.items.length), [query, role]);
+ const filteredModules = useMemo(() => allAdminModules.filter(item => (!roleModules || roleModules.has(item.id)) && (item.id !== "students" && item.id !== "accounts" || ["owner","school_admin","headteacher"].includes(role)) && (item.title + " " + item.description + " " + item.features.join(" ")).toLowerCase().includes(query.toLowerCase())), [query, role]);
+ const studentTabs = useMemo(() => [{key:"records",label:"Student register"},{key:"profiles",label:"Student profiles"},{key:"admission",label:"Admissions & numbers"},{key:"placement",label:"Class & stream placement"},{key:"progression",label:"Transfers & promotion"},{key:"status",label:"Status & archives"},{key:"attendance",label:"Attendance history"},{key:"results",label:"Examination results"},{key:"fees",label:"Fee payment history"},{key:"discipline",label:"Discipline records"},{key:"medical",label:"Medical & emergency info"},{key:"documents",label:"Student documents"},{key:"previous-school",label:"Previous school"},{key:"id-cards",label:"Student ID cards"},{key:"import-export",label:"Excel / CSV import & export"}].filter(item => item.label.toLowerCase().includes(query.toLowerCase())), [query]);
  const selected = allAdminModules.find(module => module.id === active);
 
  const openModule = (id: string) => { setActive(id); setMobileOpen(false); };
@@ -41,10 +42,9 @@ export default function SecondaryAdministration({ schoolId, schoolName, role = "
    <div className="sec-school-chip"><div className="sec-school-mark">{schoolName.slice(0,1).toUpperCase() || "S"}</div><div><strong>{schoolName}</strong><span>School administration</span></div><ChevronDown size={15}/></div>
    <div className="sec-admin-nav">
     <button className={active === "overview" ? "sec-nav-item active" : "sec-nav-item"} onClick={() => openModule("overview")}><LayoutDashboard size={17}/><span>Overview</span></button>
-    <section className="sec-nav-group sec-student-nav-group"><p>Student information</p><button className={active==="students"?"sec-nav-item active":"sec-nav-item"} onClick={()=>{setStudentSection("records");openModule("students")}}><GraduationCap size={17}/><span>Student management</span></button>
-     {(["records|Student register","profiles|Student profiles","admission|Admissions & numbers","placement|Class & stream placement","progression|Transfers & promotion","status|Status & archives","guardians|Parents & guardians","attendance|Attendance history","results|Examination results","fees|Fee payment history","discipline|Discipline records","medical|Medical & emergency info","documents|Student documents","previous-school|Previous school","id-cards|Student ID cards","import-export|Excel / CSV import & export"]).map(item=>{const [key,label]=item.split("|");return <button key={key} className={"sec-nav-subitem"+(active==="students"&&studentSection===key?" active":"")} onClick={()=>{setStudentSection(key);openModule("students")}}><span className="sec-nav-subdot"/><span>{label}</span></button>})}
-    </section>
-    {filteredGroups.map(group => <section className="sec-nav-group" key={group.title}><p>{group.title}</p>{group.items.map(item => { const Icon = item.icon; return <button key={item.id} className={active === item.id ? "sec-nav-item active" : "sec-nav-item"} onClick={() => openModule(item.id)}><Icon size={17}/><span>{item.title}</span></button>; })}</section>)}
+    <button className={active === "students" && studentSection === "records" ? "sec-nav-item active" : "sec-nav-item"} onClick={() => { setStudentSection("records"); openModule("students"); }}><GraduationCap size={17}/><span>Student management</span></button>
+    {studentTabs.map(item => <button key={item.key} className={active === "students" && studentSection === item.key ? "sec-nav-item active" : "sec-nav-item"} onClick={() => { setStudentSection(item.key); openModule("students"); }}><GraduationCap size={17}/><span>{item.label}</span></button>)}
+    {filteredModules.map(item => { const Icon = item.icon; return <button key={item.id} className={active === item.id ? "sec-nav-item active" : "sec-nav-item"} onClick={() => openModule(item.id)}><Icon size={17}/><span>{item.title}</span></button>; })}
    </div>
    <div className="sec-admin-sidebar-bottom"><div className="sec-admin-help"><CircleHelp size={17}/><strong>Administration guide</strong><span>School management workspace</span></div><button className="sec-admin-signout" onClick={() => supabase?.auth.signOut()}><LogOut size={16}/> Sign out</button></div>
   </aside>
