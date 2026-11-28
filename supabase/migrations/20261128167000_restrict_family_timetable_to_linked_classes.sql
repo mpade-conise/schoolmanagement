@@ -1,0 +1,6 @@
+drop policy if exists timetable_read on public.school_timetable_entries;
+create policy timetable_read on public.school_timetable_entries for select using(
+ private.has_school_role(school_id,array['owner','school_admin','headteacher','deputy_headteacher','academic_officer','teacher','class_teacher']::text[])
+ or (private.has_school_role(school_id,array['student']::text[]) and exists(select 1 from public.students st join public.student_enrollments se on se.student_id=st.id and se.school_id=st.school_id where st.school_id=school_timetable_entries.school_id and st.user_id=auth.uid() and st.status='active' and se.class_id=school_timetable_entries.class_id and se.academic_year_id=school_timetable_entries.academic_year_id and se.status='enrolled'))
+ or (private.has_school_role(school_id,array['parent']::text[]) and exists(select 1 from public.guardians g join public.student_guardians sg on sg.guardian_id=g.id and sg.school_id=g.school_id join public.student_enrollments se on se.student_id=sg.student_id and se.school_id=sg.school_id where g.school_id=school_timetable_entries.school_id and g.user_id=auth.uid() and se.class_id=school_timetable_entries.class_id and se.academic_year_id=school_timetable_entries.academic_year_id and se.status='enrolled'))
+);
