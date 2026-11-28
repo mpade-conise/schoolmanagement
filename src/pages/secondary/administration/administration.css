@@ -72,3 +72,63 @@
 .sec-student-helper{font-size:12px;line-height:1.55;color:#6b7488;background:#f6f8fc;border:1px solid #e5eaf2;border-radius:8px;padding:10px 12px;margin:12px 0}
 
 .sec-inventory-overlay{position:fixed;inset:0;z-index:100;background:#17213b66;display:grid;place-items:center;padding:18px}.sec-inventory-form{width:min(850px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:15px;padding:20px;box-shadow:0 20px 70px #15213b30}.sec-inventory-form-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.sec-inventory-form-head h2{font-size:17px;margin:0}.sec-inventory-form-head button{border:0;background:#f3f5fa;border-radius:8px;width:30px;height:30px;cursor:pointer}.sec-inventory-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.sec-inventory-form-grid label{display:flex;flex-direction:column;gap:6px;font-size:10px;color:#718097}.sec-inventory-form-grid input,.sec-inventory-form-grid select,.sec-inventory-form-grid textarea{width:100%;border:1px solid #e4e9f2;border-radius:8px;padding:9px 10px;font:inherit;font-size:11px;color:#26334c;background:#fff}.sec-inventory-form-grid textarea{min-height:68px;resize:vertical}.sec-inventory-wide{grid-column:1/-1}.sec-inventory-form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.sec-inventory-form-actions button{display:inline-flex;align-items:center;gap:6px;border-radius:8px;padding:9px 13px;font-size:11px;cursor:pointer}.sec-inventory-form-actions .sec-inventory-cancel{border:1px solid #e4e9f2;background:#fff;color:#64718b}.sec-inventory-form-actions .sec-inventory-save{border:1px solid #5368e8;background:#5368e8;color:#fff}.sec-inventory-form-actions button:disabled{opacity:.6}@media(max-width:600px){.sec-inventory-form-grid{grid-template-columns:1fr}.sec-inventory-wide{grid-column:auto}.sec-inventory-form{padding:15px}}
+
+/* Classic school administration theme */
+.sec-admin{--sa-ink:#202b3c;--sa-muted:#667386;--sa-line:#d5dce5;--sa-brand:#245b86;background:#edf1f5;color:#202b3c;font-family:"Segoe UI",Tahoma,Arial,sans-serif}
+.sec-admin-sidebar{background:#fdfdfd;border-right:1px solid #cbd4df;padding-top:18px}
+.sec-admin-brand strong{color:#173b5b;letter-spacing:0;font-family:Georgia,"Times New Roman",serif}
+.sec-admin-brand span{color:#63788c;letter-spacing:.8px}
+.sec-school-chip{border-radius:5px;background:#f2f5f8;border-color:#d5dce5}
+.sec-school-mark{border-radius:4px;background:#245b86;color:#fff}
+.sec-nav-item{border-radius:4px;color:#526174;font-size:12px;font-weight:600}
+.sec-nav-item:hover{background:#e8eef4;color:#245b86}
+.sec-nav-item.active{background:#245b86;color:#fff;font-weight:700}
+.sec-admin-sidebar-bottom{border-top-color:#d5dce5}
+.sec-admin-help{color:#617286}
+.sec-admin-help strong{color:#30445a}
+.sec-admin-signout{border-radius:4px;font-size:12px}
+.sec-admin-topbar{background:#fff;border-bottom:2px solid #245b86;box-shadow:0 1px 2px #172b3b0d}
+.sec-admin-breadcrumb{font-size:12px;color:#667386}
+.sec-admin-breadcrumb strong{color:#20364b}
+.sec-admin-search{border-radius:4px;background:#f7f9fb;border-color:#cbd4df}
+.sec-admin-search input{font-size:12px}
+.sec-icon-btn{border-radius:4px;color:#526174}
+.sec-icon-btn:hover{background:#e8eef4;color:#245b86}
+.sec-admin-role{color:#40566b;font-size:11px}
+.sec-admin-role svg,.sec-admin-eyebrow>span{color:#245b86;background:#245b86}
+.sec-admin-content{padding-top:26px}
+.sec-admin-welcome h1,.sec-admin-module-title h1,.sec-students-head h1{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.25px;color:#173b5b}
+.sec-admin-welcome p,.sec-admin-module-title p,.sec-students-head p{color:#667386}
+.sec-admin-stat,.sec-admin-module-card,.sec-calendar-panel,.sec-students-summary>div,.sec-students-table-wrap,.sec-admin-feature,.sec-admin-status{border-color:#d5dce5;border-radius:6px;box-shadow:none}
+.sec-admin-stat{border-top:3px solid #245b86}
+.sec-admin-stat:hover{transform:translateY(-1px);border-color:#aabccc}
+.sec-admin-stat>strong{color:#173b5b}
+.sec-admin-module-card{border-radius:6px}
+.sec-admin-module-card:hover{transform:translateY(-1px);border-color:#9eb5c9;box-shadow:0 3px 9px #20364b12}
+.sec-admin-module-icon{border-radius:5px;background:#e4edf5;color:#245b86}
+.sec-admin-module-card>strong{color:#20364b}
+.sec-admin-module-footer{border-top-color:#dfe5ec}
+.sec-admin-note{border-radius:5px;border-color:#c8d7e5;background:#eaf1f7;color:#245b86}
+.sec-admin-note strong{color:#1d4f78}
+.sec-admin-note span{color:#536f88}
+.sec-admin-feature{border-radius:5px}
+.sec-admin-feature>span{background:#e4edf5;color:#245b86;border-radius:3px}
+.sec-admin-implementation{border-radius:5px}
+.sec-admin-empty button,.sec-student-primary,.sec-inventory-form-actions .sec-inventory-save{background:#245b86;border-color:#245b86;border-radius:4px}
+.sec-student-primary:hover,.sec-inventory-form-actions .sec-inventory-save:hover{background:#173f60}
+.sec-student-primary{font-size:12px}
+.sec-students-summary>div{border-radius:5px}
+.sec-students-summary strong{color:#173b5b}
+.sec-student-search,.sec-students-toolbar select,.sec-student-refresh,.sec-students-table-wrap{border-radius:5px;border-color:#d5dce5}
+.sec-students-table th{background:#e9eef3;color:#4d6175;border-bottom-color:#d5dce5}
+.sec-students-table td{border-bottom-color:#e3e8ee}
+.sec-students-table td>strong{color:#20364b}
+.sec-student-edit{border-radius:4px;border-color:#cbd4df;color:#40566b}
+.sec-student-edit:hover{border-color:#245b86;color:#245b86}
+.sec-academic-tabs button,.sec-calendar-tabs button,.sec-academic-workspace-tabs button,.sec-academic-assessment-tabs button{border-radius:4px}
+.sec-academic-tabs button.active,.sec-calendar-tabs button.active{background:#245b86;border-color:#245b86;color:#fff}
+.sec-academic-workspace-tabs button.active{background:#245b86;color:#fff;box-shadow:none}
+.sec-calendar-panel{background:#fff}
+.sec-inventory-form{border-radius:7px}
+.sec-inventory-form-grid input,.sec-inventory-form-grid select,.sec-inventory-form-grid textarea{border-radius:4px}
+.sec-admin-footer{border-top-color:#d5dce5;color:#778597}
