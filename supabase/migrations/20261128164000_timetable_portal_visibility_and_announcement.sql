@@ -1,0 +1,46 @@
+create or replace function public.get_parent_student_timetable(p_school_id uuid,p_student_id uuid) returns jsonb language plpgsql security definer set search_path=public,auth,pg_temp as $$
+declare actor uuid:=auth.uid();v_class uuid;v_year uuid;v_guardian uuid;v_result jsonb;
+begin
+ if actor is null then raise exception 'Authentication required';end if;
+ if not exists(select 1 from public.school_memberships m where m.school_id=p_school_id and m.user_id=actor and m.is_active and m.role='parent') then raise exception 'An active parent membership is required';end if;
+ select g.id into v_guardian from public.guardians g where g.school_id=p_school_id and g.user_id=actor limit 1;
+ if v_guardian is null or not exists(select 1 from public.student_guardians sg where sg.school_id=p_school_id and sg.guardian_id=v_guardian and sg.student_id=p_student_id) then raise exception 'This learner is not linked to your guardian account';end if;
+ select se.class_id,se.academic_year_id into v_class,v_year from public.student_enrollments se join public.students s on s.id=se.student_id and s.school_id=se.school_id where se.school_id=p_school_id and se.student_id=p_student_id and se.status='enrolled' and s.status='active' order by se.enrollment_date desc limit 1;
+ if v_class is null or not exists(select 1 from public.school_timetable_publications p where p.school_id=p_school_id and p.class_id=v_class and p.academic_year_id=v_year and p.is_published) then return '[]'::jsonb;end if;
+ select coalesce(jsonb_agg(jsonb_build_object('weekday',te.weekday,'start_time',te.start_time,'end_time',te.end_time,'room',te.room,'subject',sub.name,'teacher',(select coalesce(pr.full_name,'Teacher') from public.school_memberships tm left join public.profiles pr on pr.id=tm.user_id where tm.id=te.teacher_membership_id and tm.school_id=p_school_id)) order by te.weekday,te.start_time),'[]'::jsonb) into v_result from public.school_timetable_entries te join public.subjects sub on sub.id=te.subject_id and sub.school_id=te.school_id where te.school_id=p_school_id and te.class_id=v_class and te.academic_year_id=v_year;
+ return v_result;
+end $$;
+revoke all on function public.get_parent_student_timetable(uuid,uuid) from public;grant execute on function public.get_parent_student_timetable(uuid,uuid) to authenticated;
+create or replace function public.get_student_portal_data(p_school_id uuid) returns jsonb language plpgsql security definer set search_path=public,auth,pg_temp as $function$
+declare actor uuid:=auth.uid();s public.students%rowtype;cls uuid;year_id uuid;payload jsonb;
+begin
+ if actor is null then raise exception 'Authentication required';end if;
+ if not exists(select 1 from public.school_memberships m where m.school_id=p_school_id and m.user_id=actor and m.role='student' and m.is_active) then raise exception 'An active student membership is required';end if;
+ select st.* into s from public.students st where st.school_id=p_school_id and st.user_id=actor and st.status='active' limit 1;
+ if s.id is null then return jsonb_build_object('linked',false,'student',null,'attendance','[]'::jsonb,'results','[]'::jsonb,'timetable','[]'::jsonb,'resources','[]'::jsonb,'announcements','[]'::jsonb);end if;
+ select se.class_id,se.academic_year_id into cls,year_id from public.student_enrollments se where se.school_id=p_school_id and se.student_id=s.id and se.status='enrolled' order by se.enrollment_date desc limit 1;
+ select jsonb_build_object('linked',true,'student',jsonb_build_object('id',s.id,'admission_number',s.admission_number,'first_name',s.first_name,'middle_name',s.middle_name,'last_name',s.last_name,'photo_url',s.photo_url,'status',s.status,'class_id',cls,'class_name',(select c.name from public.classes c where c.id=cls and c.school_id=p_school_id)),
+ 'attendance',coalesce((select jsonb_agg(jsonb_build_object('date',ats.attendance_date,'status',ar.status,'note',ar.note) order by ats.attendance_date desc) from (select ar2.* from public.attendance_records ar2 join public.attendance_sessions as2 on as2.id=ar2.session_id and as2.school_id=ar2.school_id where ar2.school_id=p_school_id and ar2.student_id=s.id and as2.status in ('submitted','locked') order by as2.attendance_date desc limit 60) ar join public.attendance_sessions ats on ats.id=ar.session_id and ats.school_id=ar.school_id),'[]'::jsonb),
+ 'results',coalesce((select jsonb_agg(jsonb_build_object('exam',e.name,'exam_type',e.exam_type,'start_date',e.start_date,'subject',sub.name,'mark',em.mark,'maximum_mark',es.maximum_mark,'grade',em.grade,'comment',em.comment) order by e.start_date desc,sub.name) from public.school_exam_marks em join public.school_exam_subjects es on es.id=em.exam_subject_id and es.school_id=em.school_id join public.school_exams e on e.id=es.exam_id and e.school_id=es.school_id join public.subjects sub on sub.id=es.subject_id and sub.school_id=es.school_id where em.school_id=p_school_id and em.student_id=s.id and e.status='published' and es.status='published'),'[]'::jsonb),
+ 'timetable',coalesce((select jsonb_agg(jsonb_build_object('weekday',te.weekday,'start_time',te.start_time,'end_time',te.end_time,'room',te.room,'subject',sub.name,'teacher',(select coalesce(pr.full_name,'Teacher') from public.profiles pr join public.school_memberships tm on tm.user_id=pr.id where tm.id=te.teacher_membership_id)) order by te.weekday,te.start_time) from public.school_timetable_entries te join public.subjects sub on sub.id=te.subject_id and sub.school_id=te.school_id where te.school_id=p_school_id and te.class_id=cls and te.academic_year_id=year_id and exists(select 1 from public.school_timetable_publications tp where tp.school_id=te.school_id and tp.class_id=te.class_id and tp.academic_year_id=te.academic_year_id and tp.is_published)),'[]'::jsonb),
+ 'resources',coalesce((select jsonb_agg(jsonb_build_object('id',r.id,'title',r.title,'description',r.description,'category',r.category,'subject',(select sub.name from public.subjects sub where sub.id=r.subject_id and sub.school_id=p_school_id),'file_path',r.file_path,'external_url',r.external_url,'file_name',r.file_name,'created_at',r.created_at) order by r.created_at desc) from public.teacher_class_resources r where r.school_id=p_school_id and r.class_id=cls),'[]'::jsonb),
+ 'announcements',coalesce((select jsonb_agg(jsonb_build_object('id',a.id,'title',a.title,'body',a.body,'priority',a.priority,'publish_at',a.publish_at,'attachment_path',a.attachment_path) order by a.publish_at desc) from public.school_announcements a where a.school_id=p_school_id and a.status='published' and a.publish_at<=now() and (a.audience_type='school' or (a.audience_type='roles' and 'student'=any(a.audience_roles)) or (a.audience_type='class' and a.class_id=cls))),'[]'::jsonb)
+ ) into payload;
+ return payload;
+end $function$;
+create or replace function public.publish_school_timetable(p_school_id uuid,p_academic_year_id uuid,p_class_id uuid,p_publish boolean default true) returns integer language plpgsql security definer set search_path=public,private,pg_temp as $$
+declare v_id uuid;v_version integer;v_count integer;v_user uuid;v_class_name text;
+begin
+ v_user:=auth.uid();if v_user is null then raise exception 'Authentication required';end if;
+ if not private.has_school_role(p_school_id,array['owner','school_admin','headteacher']::text[]) then raise exception 'Only school leadership can publish timetables';end if;
+ select c.name into v_class_name from public.classes c where c.id=p_class_id and c.school_id=p_school_id and c.academic_year_id=p_academic_year_id;if not found then raise exception 'Class does not belong to this academic year';end if;
+ select count(*) into v_count from public.school_timetable_entries e where e.school_id=p_school_id and e.academic_year_id=p_academic_year_id and e.class_id=p_class_id;
+ if p_publish and v_count=0 then raise exception 'Add at least one lesson before publishing';end if;
+ insert into public.school_timetable_publications(school_id,academic_year_id,class_id,version,published_by,is_published,published_at,updated_at) values(p_school_id,p_academic_year_id,p_class_id,1,v_user,p_publish,now(),now())
+ on conflict(school_id,academic_year_id,class_id) do update set version=school_timetable_publications.version+1,published_by=excluded.published_by,is_published=excluded.is_published,published_at=now(),updated_at=now() returning id,version into v_id,v_version;
+ if p_publish then
+  insert into public.school_timetable_publication_notifications(school_id,academic_year_id,class_id,publication_id,version,message) values(p_school_id,p_academic_year_id,p_class_id,v_id,v_version,'A new or updated class timetable has been published.');
+  insert into public.school_announcements(school_id,title,body,priority,audience_type,audience_roles,class_id,status,publish_at,created_by,published_by,created_at,updated_at) values(p_school_id,'Timetable published · '||v_class_name,'The timetable for '||v_class_name||' has been published or updated. Sign in to view the latest class timetable.','normal','class','{}',p_class_id,'published',now(),v_user,v_user,now(),now());
+ end if;return v_version;
+end $$;
+revoke all on function public.publish_school_timetable(uuid,uuid,uuid,boolean) from public;grant execute on function public.publish_school_timetable(uuid,uuid,uuid,boolean) to authenticated;
