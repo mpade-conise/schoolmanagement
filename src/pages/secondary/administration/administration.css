@@ -132,3 +132,26 @@
 .sec-inventory-form{border-radius:7px}
 .sec-inventory-form-grid input,.sec-inventory-form-grid select,.sec-inventory-form-grid textarea{border-radius:4px}
 .sec-admin-footer{border-top-color:#d5dce5;color:#778597}
+
+/* Classic green school administration palette */
+.sec-admin{--sa-brand:#2f704b;background:#edf2ed}
+.sec-admin-sidebar{background:#fcfdfb;border-right-color:#d0dbd1}
+.sec-admin-brand strong,.sec-admin-welcome h1,.sec-admin-module-title h1,.sec-students-head h1{color:#234b35}
+.sec-school-chip{background:#f0f5f0;border-color:#d2ded3}
+.sec-school-mark,.sec-nav-item.active,.sec-admin-stat{--sa-brand:#2f704b}
+.sec-school-mark{background:#2f704b}
+.sec-nav-item:hover,.sec-icon-btn:hover{background:#eaf2eb;color:#2f704b}
+.sec-nav-item.active{background:#2f704b;color:#fff}
+.sec-admin-topbar{border-bottom-color:#2f704b}
+.sec-admin-role svg,.sec-admin-eyebrow>span{color:#2f704b;background:#2f704b}
+.sec-admin-stat{border-top-color:#2f704b}
+.sec-admin-stat>strong,.sec-admin-stat:hover{color:#234b35}
+.sec-admin-module-icon,.sec-admin-feature>span{background:#e6f0e8;color:#2f704b}
+.sec-admin-note{border-color:#cbdccf;background:#edf5ee;color:#2f704b}
+.sec-admin-note strong{color:#234b35}
+.sec-admin-note span{color:#587661}
+.sec-admin-empty button,.sec-student-primary,.sec-inventory-form-actions .sec-inventory-save{background:#2f704b;border-color:#2f704b}
+.sec-student-primary:hover,.sec-inventory-form-actions .sec-inventory-save:hover{background:#234b35}
+.sec-student-edit:hover{border-color:#2f704b;color:#2f704b}
+.sec-academic-tabs button.active,.sec-calendar-tabs button.active,.sec-academic-workspace-tabs button.active{background:#2f704b;border-color:#2f704b;color:#fff}
+.sec-inventory-form-grid input:focus,.sec-inventory-form-grid select:focus,.sec-inventory-form-grid textarea:focus{outline-color:#2f704b}
